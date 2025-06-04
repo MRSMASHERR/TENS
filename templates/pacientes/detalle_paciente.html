@@ -1,0 +1,542 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ paciente.nombre }} - Sistema Médico INACAP{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'lista_pacientes' %}">Pacientes</a></li>
+<li class="breadcrumb-item active">{{ paciente.nombre }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3">{{ paciente.nombre }}</h1>
+                <p class="text-muted">{{ paciente.rut }} - {{ paciente.sala_cama }}</p>
+                {% if paciente.fecha_alta %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Este paciente fue dado de alta el {{ paciente.fecha_alta }}.
+                    {% if paciente.motivo_alta %}
+                    <br>
+                    <strong>Motivo:</strong> {{ paciente.motivo_alta }}
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="d-flex">
+                <a href="{% if paciente.curso %}{% url 'detalle_curso' curso_id=paciente.curso.id %}{% else %}{% url 'lista_pacientes' %}{% endif %}" class="btn btn-secondary me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Volver
+                </a>
+                {% if not readonly %}
+                    {% if not paciente.fecha_alta %}
+                    <a href="{% url 'dar_de_alta_paciente' paciente.id %}" class="btn btn-warning me-2">
+                        <i class="fas fa-sign-out-alt me-2"></i>Dar de Alta
+                    </a>
+                    {% else %}
+                    <a href="{% url 'readmitir_paciente' paciente.id %}" class="btn btn-success me-2">
+                        <i class="fas fa-sign-in-alt me-2"></i>Readmitir
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'editar_paciente' paciente.id %}" class="btn btn-primary me-2">
+                        <i class="fas fa-edit me-2"></i>Editar
+                    </a>
+                {% endif %}
+                <a href="{% url 'ficha_clinica' paciente.id %}?download=true" class="btn btn-info">
+                    <i class="fas fa-file-pdf me-2"></i>Descargar Ficha
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Información del paciente -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Información del Paciente</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">RUT:</div>
+                    <div class="col-md-8">{{ paciente.rut }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">Edad:</div>
+                    <div class="col-md-8">{{ paciente.edad }} años</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">Fecha de Nacimiento:</div>
+                    <div class="col-md-8">{{ paciente.fecha_nacimiento|date:"d/m/Y" }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">Sala/Cama:</div>
+                    <div class="col-md-8">{{ paciente.sala_cama }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">Días de Hospitalización:</div>
+                    <div class="col-md-8">{{ paciente.dias_hospitalizacion }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">Fecha de Ingreso:</div>
+                    <div class="col-md-8">{{ paciente.fecha_ingreso|date:"d/m/Y" }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">Alergias:</div>
+                    <div class="col-md-8">
+                        {% if paciente.alergias %}
+                            {{ paciente.alergias }}
+                        {% else %}
+                            <span class="text-muted">No registradas</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">Registrado por:</div>
+                    <div class="col-md-8">{{ paciente.registrado_por.get_full_name|default:paciente.registrado_por.username }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Dispositivos</h5>
+            </div>
+            <div class="card-body">
+                {% if paciente.dispositivos.all %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Instalación</th>
+                                    <th>Días</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dispositivo in paciente.dispositivos.all|slice:":3" %}
+                                <tr>
+                                    <td>{{ dispositivo.get_tipo_display_completo }}</td>
+                                    <td>{{ dispositivo.fecha_instalacion|date:"d/m/Y" }}</td>
+                                    <td>{{ dispositivo.dias_instalacion }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% if paciente.dispositivos.all.count > 3 %}
+                            <div class="mt-2 text-center">
+                                <small><a href="#dispositivos" data-bs-toggle="tab" data-bs-target="#dispositivos">Ver todos los dispositivos ({{ paciente.dispositivos.all.count }})</a></small>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-3">
+                        <p class="text-muted mb-0">No hay dispositivos registrados</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones rápidas -->
+{% if not readonly %}
+    {% if not paciente.fecha_alta or is_admin %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Acciones Rápidas{% if paciente.fecha_alta and is_admin %} (Modo Administrador){% endif %}</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Primera fila: Registro de datos -->
+                    <div class="row mb-3">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'registrar_signos_vitales' paciente.id %}" class="btn btn-primary w-100">
+                                <i class="fas fa-heartbeat me-1"></i>Registrar Signos Vitales
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'registrar_balance' paciente.id %}" class="btn btn-success w-100">
+                                <i class="fas fa-tint me-1"></i>Registrar Balance
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'registrar_evolucion' paciente.id %}" class="btn btn-warning w-100">
+                                <i class="fas fa-plus me-1"></i>Registrar Evolución
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'registrar_dispositivo' paciente.id %}" class="btn btn-danger w-100">
+                                <i class="fas fa-plus me-1"></i>Registrar Dispositivo
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Segunda fila: Ver historiales -->
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'historial_signos_vitales' paciente.id %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-history me-1"></i>Historial Signos Vitales
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'historial_balance' paciente.id %}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-history me-1"></i>Historial Balance
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'historial_evoluciones' paciente.id %}" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-history me-1"></i>Historial Evoluciones
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'grafico_signos_vitales' paciente.id %}" class="btn btn-info w-100">
+                                <i class="fas fa-chart-line me-1"></i>Ver Gráficos
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Tercera fila -->
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'ficha_clinica' paciente.id %}" class="btn btn-dark w-100">
+                                <i class="fas fa-file-pdf me-1"></i>Ficha Clínica
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% elif paciente.fecha_alta and not is_admin %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">Acciones Disponibles (Paciente de Alta)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Este paciente está dado de alta. Solo se permite la consulta de información histórica y la descarga de documentos.
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'historial_signos_vitales' paciente.id %}" class="btn btn-info w-100">
+                                <i class="fas fa-history me-1"></i>Historial Signos Vitales
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'historial_balance' paciente.id %}" class="btn btn-info w-100">
+                                <i class="fas fa-history me-1"></i>Historial Balance Hídrico
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'historial_evoluciones' paciente.id %}" class="btn btn-info w-100">
+                                <i class="fas fa-history me-1"></i>Historial Evoluciones
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'grafico_signos_vitales' paciente.id %}" class="btn btn-info w-100">
+                                <i class="fas fa-chart-line me-1"></i>Ver Gráficos
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Segunda fila de acciones -->
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'ficha_clinica' paciente.id %}" class="btn btn-danger w-100">
+                                <i class="fas fa-file-pdf me-1"></i>Ficha Clínica
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="#dispositivos" data-bs-toggle="tab" data-bs-target="#dispositivos" class="btn btn-outline-info w-100">
+                                <i class="fas fa-syringe me-1"></i>Ver Dispositivos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endif %}
+
+<!-- Tabs de Acciones -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" id="pacienteTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="signos-tab" data-bs-toggle="tab" data-bs-target="#signos" type="button" role="tab">
+                            <i class="fas fa-heartbeat me-2"></i>Signos Vitales
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="balance-tab" data-bs-toggle="tab" data-bs-target="#balance" type="button" role="tab">
+                            <i class="fas fa-tint me-2"></i>Balance Hídrico
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="evoluciones-tab" data-bs-toggle="tab" data-bs-target="#evoluciones" type="button" role="tab">
+                            <i class="fas fa-notes-medical me-2"></i>Evoluciones
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="dispositivos-tab" data-bs-toggle="tab" data-bs-target="#dispositivos" type="button" role="tab">
+                            <i class="fas fa-syringe me-2"></i>Dispositivos
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="pacienteTabsContent">
+                    <!-- Signos Vitales -->
+                    <div class="tab-pane fade show active" id="signos" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Últimos Signos Vitales</h5>
+                            <div>
+                                {% if not readonly %}
+                                    {% if not paciente.fecha_alta or is_admin %}
+                                    <a href="{% url 'registrar_signos_vitales' paciente.id %}" class="btn btn-primary btn-sm me-2">
+                                        <i class="fas fa-heartbeat me-1"></i>Registrar Signos Vitales
+                                    </a>
+                                    {% endif %}
+                                {% endif %}
+                                <a href="{% url 'historial_signos_vitales' paciente.id %}" class="btn btn-info btn-sm">
+                                    <i class="fas fa-history me-1"></i>Ver Historial
+                                </a>
+                            </div>
+                        </div>
+                        {% if paciente.signos_vitales.all %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Hora</th>
+                                        <th>P.A.</th>
+                                        <th>F.C.</th>
+                                        <th>Sat. O2</th>
+                                        <th>F.R.</th>
+                                        <th>Temp.</th>
+                                        <th>HGT</th>
+                                        <th>EVA</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for signo in paciente.signos_vitales.all|slice:":5" %}
+                                    <tr>
+                                        <td>{{ signo.fecha }}</td>
+                                        <td>{{ signo.hora }}</td>
+                                        <td>{{ signo.presion_arterial }}</td>
+                                        <td>{{ signo.frecuencia_cardiaca }}</td>
+                                        <td>{{ signo.saturacion_oxigeno }}</td>
+                                        <td>{{ signo.frecuencia_respiratoria }}</td>
+                                        <td>{{ signo.temperatura }}</td>
+                                        <td>{{ signo.hgt }}</td>
+                                        <td>{{ signo.eva }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if paciente.signos_vitales.count > 5 %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'historial_signos_vitales' paciente.id %}" class="btn btn-outline-primary btn-sm">
+                                Ver Historial Completo
+                            </a>
+                        </div>
+                        {% endif %}
+                        {% else %}
+                        <p class="text-muted">No hay registros de signos vitales.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Balance Hídrico -->
+                    <div class="tab-pane fade" id="balance" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Últimos Balances Hídricos</h5>
+                            <div>
+                                {% if not readonly %}
+                                    {% if not paciente.fecha_alta or is_admin %}
+                                    <a href="{% url 'registrar_balance' paciente.id %}" class="btn btn-success btn-sm me-2">
+                                        <i class="fas fa-tint me-1"></i>Registrar Balance
+                                    </a>
+                                    {% endif %}
+                                {% endif %}
+                                <a href="{% url 'historial_balance' paciente.id %}" class="btn btn-info btn-sm">
+                                    <i class="fas fa-history me-1"></i>Ver Historial
+                                </a>
+                            </div>
+                        </div>
+                        {% if paciente.balances_hidricos.all %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Hora</th>
+                                        <th>Ingresos</th>
+                                        <th>Egresos</th>
+                                        <th>Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for balance in paciente.balances_hidricos.all|slice:":5" %}
+                                    <tr>
+                                        <td>{{ balance.fecha }}</td>
+                                        <td>{{ balance.hora }}</td>
+                                        <td>{{ balance.total_ingresos }}</td>
+                                        <td>{{ balance.total_egresos }}</td>
+                                        <td>
+                                            {% with balance_total=balance.balance_total %}
+                                            <span class="badge {% if balance_total > 0 %}bg-success{% elif balance_total < 0 %}bg-danger{% else %}bg-info{% endif %}">
+                                                {{ balance_total }}
+                                            </span>
+                                            {% endwith %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if paciente.balances_hidricos.count > 5 %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'historial_balance' paciente.id %}" class="btn btn-outline-primary btn-sm">
+                                Ver Historial Completo
+                            </a>
+                        </div>
+                        {% endif %}
+                        {% else %}
+                        <p class="text-muted">No hay registros de balance hídrico.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Evoluciones -->
+                    <div class="tab-pane fade" id="evoluciones" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Últimas Evoluciones</h5>
+                            <div>
+                                {% if not readonly %}
+                                    {% if not paciente.fecha_alta or is_admin %}
+                                    <a href="{% url 'registrar_evolucion' paciente.id %}" class="btn btn-warning btn-sm me-2">
+                                        <i class="fas fa-plus me-1"></i>Registrar Evolución
+                                    </a>
+                                    {% endif %}
+                                {% endif %}
+                                <a href="{% url 'historial_evoluciones' paciente.id %}" class="btn btn-info btn-sm">
+                                    <i class="fas fa-history me-1"></i>Ver Historial
+                                </a>
+                            </div>
+                        </div>
+                        {% if paciente.evoluciones.all %}
+                        <div class="list-group">
+                            {% for evolucion in paciente.evoluciones.all|slice:":5" %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ evolucion.fecha }} {{ evolucion.hora }}</h6>
+                                    <small>{{ evolucion.responsable.get_full_name }}</small>
+                                </div>
+                                <p class="mb-1">{{ evolucion.registro }}</p>
+                                {% if evolucion.indicaciones %}
+                                <small class="text-muted">
+                                    <strong>Indicaciones:</strong> {{ evolucion.indicaciones }}
+                                </small>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if paciente.evoluciones.count > 5 %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'historial_evoluciones' paciente.id %}" class="btn btn-outline-primary btn-sm">
+                                Ver Historial Completo
+                            </a>
+                        </div>
+                        {% endif %}
+                        {% else %}
+                        <p class="text-muted">No hay registros de evoluciones.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Dispositivos -->
+                    <div class="tab-pane fade" id="dispositivos" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Dispositivos Instalados</h5>
+                            <div>
+                                {% if not readonly %}
+                                    {% if not paciente.fecha_alta or is_admin %}
+                                    <a href="{% url 'registrar_dispositivo' paciente.id %}" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-plus me-1"></i>Registrar Dispositivo
+                                    </a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if paciente.dispositivos.all %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Ubicación</th>
+                                        <th>Fecha Instalación</th>
+                                        <th>Días Programados</th>
+                                        <th>Fecha Retiro</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for dispositivo in paciente.dispositivos.all %}
+                                    <tr>
+                                        <td>{{ dispositivo.get_tipo_display }}</td>
+                                        <td>{{ dispositivo.ubicacion }}</td>
+                                        <td>{{ dispositivo.fecha_instalacion }}</td>
+                                        <td>{{ dispositivo.dias_instalacion }}</td>
+                                        <td>
+                                            {% if dispositivo.fecha_retiro %}
+                                                {{ dispositivo.fecha_retiro }}
+                                            {% else %}
+                                                <span class="text-muted">Activo</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if dispositivo.fecha_retiro %}
+                                                {% if dispositivo.fecha_retiro <= today %}
+                                                <span class="badge bg-danger">Debe Retirarse</span>
+                                                {% else %}
+                                                <span class="badge bg-warning">Programado para retiro</span>
+                                                {% endif %}
+                                            {% else %}
+                                            <span class="badge bg-success">Activo</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'eliminar_dispositivo' dispositivo.id %}" 
+                                               class="btn btn-sm btn-danger" 
+                                               onclick="return confirm('¿Está seguro que desea eliminar este dispositivo?')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No hay dispositivos registrados.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

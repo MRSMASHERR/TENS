@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+
+{% block title %}Gráficos de Signos Vitales - {{ paciente.nombre }}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'lista_pacientes' %}">Pacientes</a></li>
+<li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+<li class="breadcrumb-item"><a href="{% url 'historial_signos_vitales' paciente.id %}">Signos Vitales</a></li>
+<li class="breadcrumb-item active">Gráfico</li>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2">Gráficos de Signos Vitales</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+                    <li class="breadcrumb-item active">Gráficos de Signos Vitales</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Información del Paciente</h6>
+                    <p class="mb-1"><strong>Nombre:</strong> {{ paciente.nombre }}</p>
+                    <p class="mb-1"><strong>RUT:</strong> {{ paciente.rut }}</p>
+                    <p class="mb-1"><strong>Edad:</strong> {{ paciente.edad }} años</p>
+                    <p class="mb-1"><strong>Sala/Cama:</strong> {{ paciente.sala_cama }}</p>
+                    <p class="mb-0"><strong>Días Hospitalización:</strong> {{ paciente.dias_hospitalizacion }}</p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Filtros</h6>
+                    <form method="get" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" 
+                                           value="{{ fecha_inicio|date:'Y-m-d' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" 
+                                           value="{{ fecha_fin|date:'Y-m-d' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-filter me-2"></i>Filtrar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <!-- Gráfico de Presión Arterial -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Presión Arterial</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="presionArterialChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Frecuencia Cardíaca y Respiratoria -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Frecuencia Cardíaca y Respiratoria</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="frecuenciasChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Temperatura y Saturación -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Temperatura y Saturación de Oxígeno</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="tempSatChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de HGT -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Hemoglucotest</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="hgtChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Datos desde el backend
+const fechas = {{ fechas|safe }};
+const fc_data = {{ fc_data|safe }};
+const fr_data = {{ fr_data|safe }};
+const temp_data = {{ temp_data|safe }};
+const sat_data = {{ sat_data|safe }};
+const pa_sistolica = {{ pa_sistolica|safe }};
+const pa_diastolica = {{ pa_diastolica|safe }};
+const hgt_data = {{ hgt_data|safe }};
+
+// Configuración común
+const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+        mode: 'index',
+        intersect: false,
+    },
+    plugins: {
+        legend: {
+            position: 'top',
+        }
+    },
+    scales: {
+        x: {
+            type: 'category',
+            ticks: {
+                maxRotation: 45,
+                minRotation: 45
+            }
+        }
+    }
+};
+
+// Gráfico de Presión Arterial
+new Chart(document.getElementById('presionArterialChart'), {
+    type: 'line',
+    data: {
+        labels: fechas,
+        datasets: [{
+            label: 'Sistólica',
+            data: pa_sistolica,
+            borderColor: 'rgb(255, 99, 132)',
+            tension: 0.1
+        }, {
+            label: 'Diastólica',
+            data: pa_diastolica,
+            borderColor: 'rgb(54, 162, 235)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        ...commonOptions,
+        scales: {
+            ...commonOptions.scales,
+            y: {
+                title: {
+                    display: true,
+                    text: 'mmHg'
+                }
+            }
+        }
+    }
+});
+
+// Gráfico de Frecuencias
+new Chart(document.getElementById('frecuenciasChart'), {
+    type: 'line',
+    data: {
+        labels: fechas,
+        datasets: [{
+            label: 'Frecuencia Cardíaca',
+            data: fc_data,
+            borderColor: 'rgb(255, 159, 64)',
+            tension: 0.1
+        }, {
+            label: 'Frecuencia Respiratoria',
+            data: fr_data,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        ...commonOptions,
+        scales: {
+            ...commonOptions.scales,
+            y: {
+                title: {
+                    display: true,
+                    text: 'por minuto'
+                }
+            }
+        }
+    }
+});
+
+// Gráfico de Temperatura y Saturación
+new Chart(document.getElementById('tempSatChart'), {
+    type: 'line',
+    data: {
+        labels: fechas,
+        datasets: [{
+            label: 'Temperatura',
+            data: temp_data,
+            borderColor: 'rgb(153, 102, 255)',
+            tension: 0.1,
+            yAxisID: 'y'
+        }, {
+            label: 'Saturación',
+            data: sat_data,
+            borderColor: 'rgb(255, 206, 86)',
+            tension: 0.1,
+            yAxisID: 'y1'
+        }]
+    },
+    options: {
+        ...commonOptions,
+        scales: {
+            ...commonOptions.scales,
+            y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                title: {
+                    display: true,
+                    text: '°C'
+                },
+                min: 35,
+                max: 42
+            },
+            y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                title: {
+                    display: true,
+                    text: '%'
+                },
+                min: 80,
+                max: 100,
+                grid: {
+                    drawOnChartArea: false
+                }
+            }
+        }
+    }
+});
+
+// Gráfico de HGT
+new Chart(document.getElementById('hgtChart'), {
+    type: 'line',
+    data: {
+        labels: fechas,
+        datasets: [{
+            label: 'HGT',
+            data: hgt_data,
+            borderColor: 'rgb(201, 203, 207)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        ...commonOptions,
+        scales: {
+            ...commonOptions.scales,
+            y: {
+                title: {
+                    display: true,
+                    text: 'mg/dL'
+                }
+            }
+        }
+    }
+});
+
+// Inicializar datepickers
+document.addEventListener('DOMContentLoaded', function() {
+    var fechaInicio = document.getElementById('fecha_inicio');
+    var fechaFin = document.getElementById('fecha_fin');
+    
+    if (fechaInicio && !fechaInicio.value) {
+        fechaInicio.valueAsDate = new Date();
+    }
+    if (fechaFin && !fechaFin.value) {
+        fechaFin.valueAsDate = new Date();
+    }
+});
+</script>
+{% endblock %} 

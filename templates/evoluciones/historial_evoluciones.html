@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+
+{% block title %}Historial de Evoluciones - {{ paciente.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2">Historial de Evoluciones</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+                    <li class="breadcrumb-item active">Historial de Evoluciones</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+            <a href="{% url 'registrar_evolucion' paciente.id %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Registrar Evolución
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Información del Paciente</h6>
+                    <p class="mb-1"><strong>Nombre:</strong> {{ paciente.nombre }}</p>
+                    <p class="mb-1"><strong>RUT:</strong> {{ paciente.rut }}</p>
+                    <p class="mb-1"><strong>Edad:</strong> {{ paciente.edad }} años</p>
+                    <p class="mb-1"><strong>Sala/Cama:</strong> {{ paciente.sala_cama }}</p>
+                    <p class="mb-0"><strong>Días Hospitalización:</strong> {{ paciente.dias_hospitalizacion }}</p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Filtros</h6>
+                    <form method="get" class="mb-3">
+                        <div class="mb-3">
+                            <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" 
+                                   value="{{ fecha_inicio|date:'Y-m-d' }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" 
+                                   value="{{ fecha_fin|date:'Y-m-d' }}">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>Filtrar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <ul class="nav nav-tabs mb-4" id="evolucionesTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="todas-tab" data-bs-toggle="tab" data-bs-target="#todas" type="button" role="tab">
+                                Todas las Evoluciones
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="docentes-tab" data-bs-toggle="tab" data-bs-target="#docentes" type="button" role="tab">
+                                Evoluciones Docentes
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="estudiantes-tab" data-bs-toggle="tab" data-bs-target="#estudiantes" type="button" role="tab">
+                                Evoluciones Estudiantes
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="evolucionesTabContent">
+                        <!-- Todas las evoluciones -->
+                        <div class="tab-pane fade show active" id="todas" role="tabpanel">
+                            <div class="timeline">
+                                {% for evolucion in evoluciones %}
+                                <div class="timeline-item">
+                                    <div class="timeline-marker {% if evolucion.responsable.rol == 'docente' %}bg-primary{% else %}bg-info{% endif %}"></div>
+                                    <div class="timeline-content">
+                                        <div class="card mb-4">
+                                            <div class="card-header {% if evolucion.responsable.rol == 'docente' %}bg-primary text-white{% else %}bg-light{% endif %}">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h5 class="card-title mb-0">
+                                                            {{ evolucion.fecha|date:"d/m/Y" }} {{ evolucion.hora }}
+                                                        </h5>
+                                                        <small class="{% if evolucion.responsable.rol == 'docente' %}text-white{% else %}text-muted{% endif %}">
+                                                            Registrado por {{ evolucion.responsable.get_full_name }} 
+                                                            ({{ evolucion.responsable.get_rol_display }})
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <h6 class="card-subtitle mb-2">Evolución Clínica</h6>
+                                                <p class="card-text">{{ evolucion.evolucion|linebreaks }}</p>
+
+                                                {% if evolucion.indicaciones %}
+                                                <h6 class="card-subtitle mb-2 mt-4">Indicaciones Médicas</h6>
+                                                <p class="card-text">{{ evolucion.indicaciones|linebreaks }}</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="text-center py-4">
+                                    <p class="text-muted mb-0">No hay evoluciones registradas</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Evoluciones de docentes -->
+                        <div class="tab-pane fade" id="docentes" role="tabpanel">
+                            <div class="timeline">
+                                {% for evolucion in evoluciones_docentes %}
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-primary"></div>
+                                    <div class="timeline-content">
+                                        <div class="card mb-4">
+                                            <div class="card-header bg-primary text-white">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h5 class="card-title mb-0">
+                                                            {{ evolucion.fecha|date:"d/m/Y" }} {{ evolucion.hora }}
+                                                        </h5>
+                                                        <small class="text-white">
+                                                            Registrado por {{ evolucion.responsable.get_full_name }}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <h6 class="card-subtitle mb-2">Evolución Clínica</h6>
+                                                <p class="card-text">{{ evolucion.evolucion|linebreaks }}</p>
+
+                                                {% if evolucion.indicaciones %}
+                                                <h6 class="card-subtitle mb-2 mt-4">Indicaciones Médicas</h6>
+                                                <p class="card-text">{{ evolucion.indicaciones|linebreaks }}</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="text-center py-4">
+                                    <p class="text-muted mb-0">No hay evoluciones de docentes registradas</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Evoluciones de estudiantes -->
+                        <div class="tab-pane fade" id="estudiantes" role="tabpanel">
+                            <div class="timeline">
+                                {% for evolucion in evoluciones_estudiantes %}
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-info"></div>
+                                    <div class="timeline-content">
+                                        <div class="card mb-4">
+                                            <div class="card-header bg-light">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h5 class="card-title mb-0">
+                                                            {{ evolucion.fecha|date:"d/m/Y" }} {{ evolucion.hora }}
+                                                        </h5>
+                                                        <small class="text-muted">
+                                                            Registrado por {{ evolucion.responsable.get_full_name }}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <h6 class="card-subtitle mb-2">Evolución Clínica</h6>
+                                                <p class="card-text">{{ evolucion.evolucion|linebreaks }}</p>
+
+                                                {% if evolucion.indicaciones %}
+                                                <h6 class="card-subtitle mb-2 mt-4">Indicaciones Médicas</h6>
+                                                <p class="card-text">{{ evolucion.indicaciones|linebreaks }}</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="text-center py-4">
+                                    <p class="text-muted mb-0">No hay evoluciones de estudiantes registradas</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #007bff;
+}
+
+.timeline-content {
+    position: relative;
+}
+
+.timeline:before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #e9ecef;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar datepickers si es necesario
+    var fechaInicio = document.getElementById('fecha_inicio');
+    var fechaFin = document.getElementById('fecha_fin');
+    
+    if (fechaInicio && !fechaInicio.value) {
+        fechaInicio.valueAsDate = new Date();
+    }
+    if (fechaFin && !fechaFin.value) {
+        fechaFin.valueAsDate = new Date();
+    }
+});
+</script>
+{% endblock %} 

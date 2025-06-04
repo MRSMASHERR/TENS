@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200px" height="200px" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <title>No hay datos</title>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <!-- Fondo circular -->
+        <circle fill="#F5F6FA" cx="100" cy="100" r="100"/>
+        
+        <!-- Icono de documento -->
+        <g transform="translate(50, 40)">
+            <!-- Contorno del documento -->
+            <path d="M80,0 C88.8,0 96,7.2 96,16 L96,104 C96,112.8 88.8,120 80,120 L16,120 C7.2,120 0,112.8 0,104 L0,16 C0,7.2 7.2,0 16,0 L80,0 Z" fill="#E1E4E8"/>
+            
+            <!-- Líneas de texto -->
+            <rect fill="#C9CCD1" x="20" y="30" width="56" height="8" rx="4"/>
+            <rect fill="#C9CCD1" x="20" y="50" width="40" height="8" rx="4"/>
+            <rect fill="#C9CCD1" x="20" y="70" width="48" height="8" rx="4"/>
+            
+            <!-- Icono de búsqueda -->
+            <circle stroke="#6C757D" stroke-width="4" cx="60" cy="60" r="12"/>
+            <line x1="68" y1="68" x2="76" y2="76" stroke="#6C757D" stroke-width="4" stroke-linecap="round"/>
+        </g>
+        
+        <!-- Texto -->
+        <text font-family="Arial, sans-serif" font-size="14" fill="#6C757D" text-anchor="middle" x="100" y="180">
+            No hay datos disponibles
+        </text>
+    </g>
+</svg> 

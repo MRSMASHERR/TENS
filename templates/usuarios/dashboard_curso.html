@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - {{ curso.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Encabezado del Curso -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">{{ curso.nombre }}</h1>
+            <p class="text-muted">Docente: {{ curso.docente.get_full_name }}</p>
+        </div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'mis_cursos' %}">Mis Cursos</a></li>
+                <li class="breadcrumb-item active">{{ curso.nombre }}</li>
+            </ol>
+        </nav>
+        {% if user == curso.docente %}
+        <div>
+            <a href="{% url 'invitar_estudiantes' curso.id %}" class="btn btn-primary">
+                <i class="fas fa-user-plus me-2"></i>Invitar Estudiantes
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if messages %}
+    <div class="messages mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Tarjetas de Información -->
+    <div class="row">
+        <!-- Mis Pacientes en el Curso -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Mis Pacientes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ mis_pacientes_count }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-injured fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total de Pacientes del Curso -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Pacientes del Curso
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ total_pacientes_curso }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compañeros de Curso -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Compañeros
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ curso.estudiantes.count }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-friends fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="row mb-4">
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header py-3 bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">Acciones Rápidas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="action-buttons">
+                        <a href="{% url 'registrar_paciente' curso.id %}" class="btn btn-success btn-lg btn-block mb-3 d-flex align-items-center justify-content-between">
+                            <span><i class="fas fa-user-plus me-2"></i> Registrar Nuevo Paciente</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        
+                        <a href="{% url 'lista_pacientes_curso' curso.id %}" class="btn btn-info btn-lg btn-block mb-3 d-flex align-items-center justify-content-between">
+                            <span><i class="fas fa-clipboard-list me-2"></i> Ver Todos los Pacientes</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        
+                        {% if user == curso.docente %}
+                        <a href="{% url 'invitar_estudiantes' curso.id %}" class="btn btn-primary btn-lg btn-block mb-3 d-flex align-items-center justify-content-between">
+                            <span><i class="fas fa-user-plus me-2"></i> Invitar Estudiantes</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mis Pacientes Recientes -->
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3 bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold">Mis Pacientes en este Curso</h6>
+                    <a href="{% url 'lista_pacientes_curso' curso.id %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-external-link-alt me-1"></i> Ver Todos
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if mis_pacientes_recientes %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>RUT</th>
+                                    <th>Sala/Cama</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for paciente in mis_pacientes_recientes %}
+                                <tr>
+                                    <td>{{ paciente.nombre }}</td>
+                                    <td>{{ paciente.rut }}</td>
+                                    <td>{{ paciente.sala_cama }}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-info btn-sm" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'editar_paciente' paciente.id %}" class="btn btn-warning btn-sm" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'registrar_signos_vitales' paciente.id %}" class="btn btn-success btn-sm" title="Registrar signos vitales">
+                                                <i class="fas fa-heartbeat"></i>
+                                            </a>
+                                            <a href="{% url 'registrar_evolucion' paciente.id %}" class="btn btn-primary btn-sm" title="Registrar evolución">
+                                                <i class="fas fa-notes-medical"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-user-injured fa-4x text-muted mb-3"></i>
+                        <h5>No tienes pacientes registrados en este curso</h5>
+                        <p class="text-muted">Comienza registrando tu primer paciente</p>
+                        <a href="{% url 'registrar_paciente' curso.id %}" class="btn btn-primary mt-2">
+                            <i class="fas fa-plus-circle me-2"></i> Registrar Mi Primer Paciente
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actividad Reciente del Curso -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Actividad Reciente del Curso</h6>
+        </div>
+        <div class="card-body">
+            {% if actividad_reciente %}
+            <div class="timeline">
+                {% for actividad in actividad_reciente %}
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h6 class="mb-1">{{ actividad.titulo }}</h6>
+                        <p class="text-muted mb-0">{{ actividad.descripcion }}</p>
+                        <small class="text-muted">
+                            {% if actividad.fecha|date:"H:i" != "00:00" %}
+                                {{ actividad.fecha|date:"d/m/Y H:i" }}
+                            {% else %}
+                                {{ actividad.fecha|date:"d/m/Y" }}
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-center text-muted my-3">No hay actividad reciente para mostrar.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Lista de Estudiantes -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Estudiantes Inscritos</h6>
+            {% if user == curso.docente %}
+            <a href="{% url 'invitar_estudiantes' curso.id %}" class="btn btn-primary btn-sm">
+                <i class="fas fa-user-plus"></i> Invitar Estudiantes
+            </a>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            {% if curso.estudiantes.all %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Fecha de Inscripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for estudiante in curso.estudiantes.all %}
+                        <tr>
+                            <td>{{ estudiante.get_full_name }}</td>
+                            <td>{{ estudiante.email }}</td>
+                            <td>{{ estudiante.date_joined|date:"d/m/Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center">No hay estudiantes inscritos en este curso.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sección lateral derecha -->
+    <div class="col-md-4">
+        {% if user == curso.docente %}
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Invitar Estudiante</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.email.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-envelope me-2"></i>Enviar Invitación
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Invitaciones Pendientes -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Invitaciones Pendientes</h6>
+                <a href="{% url 'invitar_estudiantes' curso.id %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-user-plus"></i> Invitación Múltiple
+                </a>
+            </div>
+            <div class="card-body">
+                {% if invitaciones_pendientes %}
+                <div class="list-group list-group-flush">
+                    {% for invitacion in invitaciones_pendientes %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ invitacion.email }}</h6>
+                            <small>{{ invitacion.fecha_envio|date:"d/m/Y" }}</small>
+                        </div>
+                        <small class="text-muted">Expira: 
+                            {% if invitacion.fecha_expiracion|date:"H:i" != "00:00" %}
+                                {{ invitacion.fecha_expiracion|date:"d/m/Y H:i" }}
+                            {% else %}
+                                {{ invitacion.fecha_expiracion|date:"d/m/Y" }}
+                            {% endif %}
+                        </small>
+                        <div class="mt-2">
+                            <form method="post" action="{% url 'detalle_curso' curso.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="reenviar">
+                                <input type="hidden" name="invitacion_id" value="{{ invitacion.id }}">
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Reenviar</button>
+                            </form>
+                            <form method="post" action="{% url 'detalle_curso' curso.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="cancelar">
+                                <input type="hidden" name="invitacion_id" value="{{ invitacion.id }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Cancelar</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-center mb-0">No hay invitaciones pendientes.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Estilos para la línea de tiempo -->
+<style>
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 20px;
+}
+
+.timeline-item:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background-color: #e3e6f0;
+}
+
+.timeline-item:after {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #4e73df;
+}
+
+.timeline-content {
+    padding: 15px;
+    background-color: #f8f9fc;
+    border-radius: 4px;
+}
+</style>
+{% endblock %} 

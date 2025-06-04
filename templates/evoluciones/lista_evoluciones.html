@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}Evoluciones - {{ paciente.nombre }} - Sistema Médico INACAP{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2">Evoluciones - {{ paciente.nombre }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+                    <li class="breadcrumb-item active">Evoluciones</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'registrar_evolucion' paciente.id %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Registrar Evolución
+        </a>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Información del Paciente</h6>
+                    <p class="mb-1"><strong>RUT:</strong> {{ paciente.rut }}</p>
+                    <p class="mb-1"><strong>Edad:</strong> {{ paciente.edad }} años</p>
+                    <p class="mb-1"><strong>Sala/Cama:</strong> {{ paciente.sala_cama }}</p>
+                    <p class="mb-0"><strong>Días Hospitalización:</strong> {{ paciente.dias_hospitalizacion }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Historial de Evoluciones</h5>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar en evoluciones...">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% for evolucion in evoluciones %}
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0">
+                                                {{ evolucion.fecha_hora|date:"d/m/Y H:i" }}
+                                            </h6>
+                                            <span class="text-muted">
+                                                {{ evolucion.responsable.get_full_name|default:evolucion.responsable.username }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle mb-2 text-muted">Registro de Evolución</h6>
+                                        <p class="card-text">{{ evolucion.registro|linebreaks }}</p>
+                                        
+                                        {% if evolucion.indicaciones %}
+                                        <h6 class="card-subtitle mb-2 text-muted mt-4">Indicaciones Médicas</h6>
+                                        <p class="card-text">{{ evolucion.indicaciones|linebreaks }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-4">
+                            <p class="text-muted mb-0">No hay evoluciones registradas</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if evoluciones.has_other_pages %}
+                    <nav aria-label="Paginación de evoluciones" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if evoluciones.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ evoluciones.previous_page_number }}">Anterior</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Anterior</span>
+                            </li>
+                            {% endif %}
+
+                            {% for num in evoluciones.paginator.page_range %}
+                            <li class="page-item {% if evoluciones.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endfor %}
+
+                            {% if evoluciones.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ evoluciones.next_page_number }}">Siguiente</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Siguiente</span>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+    
+    .timeline:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 15px;
+        height: 100%;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-left: 40px;
+        margin-bottom: 30px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -34px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #007bff;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px #007bff;
+    }
+    
+    .timeline-content {
+        margin-left: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Búsqueda en las evoluciones
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        var searchText = this.value.toLowerCase();
+        var evoluciones = document.getElementsByClassName('timeline-item');
+        
+        Array.from(evoluciones).forEach(function(evolucion) {
+            var contenido = evolucion.textContent.toLowerCase();
+            evolucion.style.display = contenido.includes(searchText) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 

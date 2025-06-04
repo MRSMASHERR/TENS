@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar Curso{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Editar Curso</h5>
+        </div>
+        <div class="card-body">
+            <p class="lead">Modifique los campos que desea actualizar en el curso.</p>
+            
+            {% if not is_admin %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>Como docente, solo puede modificar el nombre y la descripción del curso.
+            </div>
+            {% endif %}
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_nombre" class="form-label">Nombre del Curso</label>
+                        <input type="text" class="form-control" id="id_nombre" name="nombre" value="{{ form.nombre.value|default:'' }}" required>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="id_codigo" class="form-label">Código del Curso</label>
+                        <input type="text" class="form-control {% if 'codigo' in readonly_fields %}bg-light{% endif %}" 
+                               id="id_codigo" name="codigo" value="{{ form.codigo.value|default:'' }}" 
+                               {% if 'codigo' in readonly_fields %}readonly{% endif %}
+                               required>
+                        {% if 'codigo' in readonly_fields %}
+                        <small class="text-muted">Este campo solo puede ser editado por administradores.</small>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_descripcion" class="form-label">Descripción</label>
+                    <textarea class="form-control" id="id_descripcion" name="descripcion" rows="5" 
+                              placeholder="Escriba una descripción detallada del curso que ayude a los estudiantes a entender sus objetivos, contenido y metodología...">{{ form.descripcion.value|default:'' }}</textarea>
+                    <div class="form-text">
+                        <i class="fas fa-info-circle me-1"></i>Una buena descripción incluye: objetivos del curso, temas principales, metodología y competencias a desarrollar.
+                    </div>
+                </div>
+                
+                {% if is_admin %}
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="id_activo" name="activo" {% if form.activo.value %}checked{% endif %}>
+                    <label class="form-check-label" for="id_activo">Curso Activo</label>
+                </div>
+                {% endif %}
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'detalle_curso' curso_id=curso.id %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Volver
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

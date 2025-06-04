@@ -1,0 +1,455 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Paciente{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Encabezado mejorado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-2">
+                <i class="fas fa-user-edit text-primary me-2"></i>Editar Paciente
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'lista_pacientes' %}">Pacientes</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+                    <li class="breadcrumb-item active">Editar</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-user-circle text-primary me-2"></i>Información del Paciente
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <!-- Información básica -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-id-card me-2"></i>Información Básica
+                        </h6>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.nombre }}
+                            <label for="{{ form.nombre.id_for_label }}">Nombre Completo</label>
+                        </div>
+                        {% if form.nombre.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.nombre.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.rut }}
+                            <label for="{{ form.rut.id_for_label }}">RUT</label>
+                        </div>
+                        {% if form.rut.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.rut.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.fecha_nacimiento }}
+                            <label for="{{ form.fecha_nacimiento.id_for_label }}">Fecha de Nacimiento</label>
+                        </div>
+                        {% if form.fecha_nacimiento.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.fecha_nacimiento.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Campos de contacto -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-address-book me-2"></i>Información de Contacto
+                        </h6>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.genero }}
+                            <label for="{{ form.genero.id_for_label }}">Género</label>
+                        </div>
+                        <div id="genero_otro_container" style="display: none;" class="mt-2">
+                            {{ form.genero_otro }}
+                        </div>
+                        {% if form.genero.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.genero.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.telefono }}
+                            <label for="{{ form.telefono.id_for_label }}">Teléfono</label>
+                        </div>
+                        {% if form.telefono.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.telefono.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.email }}
+                            <label for="{{ form.email.id_for_label }}">Email</label>
+                        </div>
+                        {% if form.email.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.email.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            {{ form.direccion }}
+                            <label for="{{ form.direccion.id_for_label }}">Dirección</label>
+                        </div>
+                        {% if form.direccion.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.direccion.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Información de hospitalización -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-hospital me-2"></i>Información de Hospitalización
+                        </h6>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.sala_cama }}
+                            <label for="{{ form.sala_cama.id_for_label }}">Sala/Cama</label>
+                        </div>
+                        {% if form.sala_cama.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.sala_cama.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.dias_hospitalizacion }}
+                            <label for="{{ form.dias_hospitalizacion.id_for_label }}">Días de hospitalización</label>
+                        </div>
+                        {% if form.dias_hospitalizacion.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.dias_hospitalizacion.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Información clínica -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-notes-medical me-2"></i>Información Clínica
+                        </h6>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.motivo_consulta }}
+                            <label for="{{ form.motivo_consulta.id_for_label }}">Motivo de Consulta</label>
+                        </div>
+                        {% if form.motivo_consulta.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.motivo_consulta.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form.diagnostico }}
+                            <label for="{{ form.diagnostico.id_for_label }}">Diagnóstico</label>
+                        </div>
+                        {% if form.diagnostico.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.diagnostico.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-12">
+                        <div class="form-floating">
+                            {{ form.antecedentes_morbidos }}
+                            <label for="{{ form.antecedentes_morbidos.id_for_label }}">Antecedentes Mórbidos</label>
+                        </div>
+                        {% if form.antecedentes_morbidos.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.antecedentes_morbidos.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-12">
+                        <div class="form-floating">
+                            {{ form.alergias }}
+                            <label for="{{ form.alergias.id_for_label }}">Alergias</label>
+                        </div>
+                        <small class="form-text text-muted">{{ form.alergias.help_text }}</small>
+                        {% if form.alergias.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.alergias.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Hábitos -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-heartbeat me-2"></i>Hábitos
+                        </h6>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            {{ form.tabaquismo }}
+                                            <label class="form-check-label" for="{{ form.tabaquismo.id_for_label }}">
+                                                <i class="fas fa-smoking me-2"></i>Tabaquismo
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            {{ form.alcoholismo }}
+                                            <label class="form-check-label" for="{{ form.alcoholismo.id_for_label }}">
+                                                <i class="fas fa-wine-bottle me-2"></i>Alcoholismo
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">
+                                            <i class="fas fa-pills me-2"></i>Drogas
+                                        </label>
+                                        {{ form.drogas }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Brazalete -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-barcode me-2"></i>Brazalete
+                        </h6>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    {% for radio in form.brazalete %}
+                                    <div class="form-check me-3">
+                                        {{ radio.tag }}
+                                        <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                            {{ radio.choice_label }}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.brazalete.errors %}
+                                    <div class="text-danger">{{ form.brazalete.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Previsión -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-file-invoice me-2"></i>Previsión
+                        </h6>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div>
+                                    {% for radio in form.prevision %}
+                                    <div class="form-check">
+                                        {{ radio.tag }}
+                                        <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                            {{ radio.choice_label }}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                    <!-- Campo para prevision otra -->
+                                    <div id="prevision_otra_field" class="ms-4 mt-2 mb-3" style="display: none;">
+                                        <label class="form-label">Especificar previsión:</label>
+                                        {{ form.prevision_otra }}
+                                    </div>
+                                </div>
+                                {% if form.prevision.errors %}
+                                    <div class="text-danger">{{ form.prevision.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Validación del formulario
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+    
+    // Inicialización y eventos para los campos dinámicos
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mostrar/ocultar campo de otra previsión
+        const previsionRadios = document.querySelectorAll('input[name="prevision"]');
+        const previsionOtrasRadio = document.querySelector('input[value="OTRAS"]');
+        const previsionOtraField = document.getElementById('prevision_otra_field');
+        
+        function actualizarVisibilidadPrevisionOtra() {
+            if (previsionOtrasRadio && previsionOtrasRadio.checked) {
+                previsionOtraField.style.display = 'block';
+            } else {
+                previsionOtraField.style.display = 'none';
+            }
+        }
+        
+        if (previsionOtraField) {
+            actualizarVisibilidadPrevisionOtra();
+            
+            previsionRadios.forEach(function(radio) {
+                radio.addEventListener('change', actualizarVisibilidadPrevisionOtra);
+            });
+        }
+        
+        // Mostrar/ocultar campo de otro género
+        const generoSelect = document.getElementById('{{ form.genero.id_for_label }}');
+        const generoOtroContainer = document.getElementById('genero_otro_container');
+        const generoOtroInput = document.getElementById('id_genero_otro');
+        
+        if (generoSelect && generoOtroContainer && generoOtroInput) {
+            if (generoSelect.value === 'O') {
+                generoOtroContainer.style.display = 'block';
+                generoOtroInput.style.display = 'block';
+            } else {
+                generoOtroContainer.style.display = 'none';
+                generoOtroInput.style.display = 'none';
+            }
+            
+            generoSelect.addEventListener('change', function() {
+                if (this.value === 'O') {
+                    generoOtroContainer.style.display = 'block';
+                    generoOtroInput.style.display = 'block';
+                } else {
+                    generoOtroContainer.style.display = 'none';
+                    generoOtroInput.style.display = 'none';
+                }
+            });
+        }
+
+        const form = document.querySelector('form');
+        
+        // Prevenir envío del formulario al presionar Enter
+        form.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                return false;
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 

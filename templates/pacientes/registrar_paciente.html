@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Paciente{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Registrar Paciente</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Datos del Paciente</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre completo</label>
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                                <div class="text-danger">{{ form.nombre.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.rut.id_for_label }}" class="form-label">RUT</label>
+                            {{ form.rut }}
+                            {% if form.rut.errors %}
+                                <div class="text-danger">{{ form.rut.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.fecha_nacimiento.id_for_label }}" class="form-label">Fecha de Nacimiento</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                {{ form.fecha_nacimiento }}
+                            </div>
+                            <small class="form-text text-muted">{{ form.fecha_nacimiento.help_text }}</small>
+                            {% if form.fecha_nacimiento.errors %}
+                                <div class="text-danger">{{ form.fecha_nacimiento.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.edad_mostrar.id_for_label }}" class="form-label">Edad</label>
+                            {{ form.edad_mostrar }}
+                            <small class="form-text text-muted">Se calcula automáticamente</small>
+                            {% if form.edad_mostrar.errors %}
+                                <div class="text-danger">{{ form.edad_mostrar.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.genero.id_for_label }}" class="form-label">Género</label>
+                            {{ form.genero }}
+                            <div id="genero_otro_container" style="display: none;" class="mt-2">
+                                {{ form.genero_otro }}
+                            </div>
+                            {% if form.genero.errors %}
+                                <div class="text-danger">{{ form.genero.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono</label>
+                            {{ form.telefono }}
+                            {% if form.telefono.errors %}
+                                <div class="text-danger">{{ form.telefono.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.direccion.id_for_label }}" class="form-label">Dirección</label>
+                            {{ form.direccion }}
+                            {% if form.direccion.errors %}
+                                <div class="text-danger">{{ form.direccion.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.sala_cama.id_for_label }}" class="form-label">Sala/Cama</label>
+                            {{ form.sala_cama }}
+                            {% if form.sala_cama.errors %}
+                                <div class="text-danger">{{ form.sala_cama.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.dias_hospitalizacion.id_for_label }}" class="form-label">Días de hospitalización</label>
+                            {{ form.dias_hospitalizacion }}
+                            {% if form.dias_hospitalizacion.errors %}
+                                <div class="text-danger">{{ form.dias_hospitalizacion.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="{{ form.alergias.id_for_label }}" class="form-label">Alergias</label>
+                            {{ form.alergias }}
+                            <small class="form-text text-muted">{{ form.alergias.help_text }}</small>
+                            {% if form.alergias.errors %}
+                                <div class="text-danger">{{ form.alergias.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Antecedentes Mórbidos -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="{{ form.antecedentes_morbidos.id_for_label }}" class="form-label">Antecedentes Mórbidos</label>
+                            {{ form.antecedentes_morbidos }}
+                            {% if form.antecedentes_morbidos.errors %}
+                                <div class="text-danger">{{ form.antecedentes_morbidos.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Motivo de Consulta -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="{{ form.motivo_consulta.id_for_label }}" class="form-label">Motivo Consulta</label>
+                            {{ form.motivo_consulta }}
+                            {% if form.motivo_consulta.errors %}
+                                <div class="text-danger">{{ form.motivo_consulta.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Diagnóstico -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="{{ form.diagnostico.id_for_label }}" class="form-label">Diagnóstico</label>
+                            {{ form.diagnostico }}
+                            {% if form.diagnostico.errors %}
+                                <div class="text-danger">{{ form.diagnostico.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Hábitos -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Hábitos</label>
+                            <div class="form-check">
+                                {{ form.tabaquismo }}
+                                <label class="form-check-label" for="{{ form.tabaquismo.id_for_label }}">
+                                    Tabaquismo
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                {{ form.alcoholismo }}
+                                <label class="form-check-label" for="{{ form.alcoholismo.id_for_label }}">
+                                    Alcoholismo
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input type="checkbox" class="form-check-input" id="drogas_check">
+                                <label class="form-check-label" for="drogas_check">
+                                    Drogas. Cuál
+                                </label>
+                            </div>
+                            <div id="drogas_field" class="ms-4 mb-3" style="display: none;">
+                                {{ form.drogas }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Brazalete -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Brazalete</label>
+                            <div class="d-flex">
+                                {% for radio in form.brazalete %}
+                                <div class="form-check me-3">
+                                    {{ radio.tag }}
+                                    <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.brazalete.errors %}
+                                <div class="text-danger">{{ form.brazalete.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Previsión -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Previsión</label>
+                            <div>
+                                {% for radio in form.prevision %}
+                                <div class="form-check">
+                                    {{ radio.tag }}
+                                    <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                                <!-- Campo para prevision otra -->
+                                <div id="prevision_otra_field" class="ms-4 mt-2 mb-3" style="display: none;">
+                                    <label class="form-label">Especificar previsión:</label>
+                                    {{ form.prevision_otra }}
+                                </div>
+                            </div>
+                            {% if form.prevision.errors %}
+                                <div class="text-danger">{{ form.prevision.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-4 mb-3">
+                        <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Dispositivos médicos</h5>
+                        <p>Los dispositivos médicos (Sondas, Vías Aéreas, VVP, Drenajes) se pueden agregar después de registrar al paciente desde su ficha clínica.</p>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        {% if curso %}
+                        <a href="{% url 'detalle_curso' curso.id %}" class="btn btn-secondary me-md-2">Cancelar</a>
+                        {% else %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary me-md-2">Cancelar</a>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">Registrar Paciente</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Calcular la edad automáticamente cuando cambia la fecha de nacimiento
+    document.addEventListener('DOMContentLoaded', function() {
+        const fechaNacimientoInput = document.getElementById('{{ form.fecha_nacimiento.id_for_label }}');
+        const edadMostrarInput = document.getElementById('{{ form.edad_mostrar.id_for_label }}');
+        
+        fechaNacimientoInput.addEventListener('change', function() {
+            const fechaNacimiento = new Date(this.value);
+            if (!isNaN(fechaNacimiento.getTime())) {
+                const hoy = new Date();
+                let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+                const m = hoy.getMonth() - fechaNacimiento.getMonth();
+                
+                // Si aún no ha llegado el cumpleaños de este año, restar un año
+                if (m < 0 || (m === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+                    edad--;
+                }
+                
+                edadMostrarInput.value = edad;
+            } else {
+                edadMostrarInput.value = '';
+            }
+        });
+        
+        // Mostrar/ocultar campo de drogas
+        const drogasCheck = document.getElementById('drogas_check');
+        const drogasField = document.getElementById('drogas_field');
+        
+        if (drogasCheck) {
+            drogasCheck.addEventListener('change', function() {
+                drogasField.style.display = this.checked ? 'block' : 'none';
+            });
+        }
+        
+        // Mostrar/ocultar campo de otra previsión
+        const previsionRadios = document.querySelectorAll('input[name="prevision"]');
+        const previsionOtrasRadio = document.querySelector('input[value="OTRAS"]');
+        const previsionOtraField = document.getElementById('prevision_otra_field');
+        
+        console.log('Prevision radios:', previsionRadios);
+        console.log('Prevision OTRAS radio:', previsionOtrasRadio);
+        console.log('Prevision otra field:', previsionOtraField);
+        
+        // Función para actualizar la visibilidad del campo de previsión otra
+        function actualizarVisibilidadPrevisionOtra() {
+            console.log('Actualizando visibilidad prevision otra');
+            console.log('OTRAS checked:', previsionOtrasRadio ? previsionOtrasRadio.checked : 'radio no encontrado');
+            
+            if (previsionOtrasRadio && previsionOtrasRadio.checked) {
+                console.log('Mostrando campo prevision_otra');
+                previsionOtraField.style.display = 'block';
+            } else {
+                console.log('Ocultando campo prevision_otra');
+                previsionOtraField.style.display = 'none';
+            }
+        }
+        
+        // Inicializar la visibilidad al cargar la página
+        if (previsionOtraField) {
+            actualizarVisibilidadPrevisionOtra();
+            
+            // Agregar eventos para cambios en las opciones de previsión
+            previsionRadios.forEach(function(radio) {
+                radio.addEventListener('change', actualizarVisibilidadPrevisionOtra);
+            });
+        }
+        
+        // Mostrar/ocultar campo de otro género
+        const generoSelect = document.getElementById('id_genero');
+        const generoOtroContainer = document.getElementById('genero_otro_container');
+        
+        // Asegurar que los elementos existen antes de continuar
+        if (generoSelect && generoOtroContainer) {
+            // Inicializar visibilidad de género otro
+            if (generoSelect.value === 'O') {
+                generoOtroContainer.style.display = 'block';
+                document.getElementById('id_genero_otro').style.display = 'block';
+            }
+            
+            // Añadir evento para cambio de género
+            generoSelect.addEventListener('change', function() {
+                console.log('Género cambiado a:', this.value);
+                if (this.value === 'O') {
+                    generoOtroContainer.style.display = 'block';
+                    document.getElementById('id_genero_otro').style.display = 'block';
+                } else {
+                    generoOtroContainer.style.display = 'none';
+                    document.getElementById('id_genero_otro').style.display = 'none';
+                }
+            });
+        } else {
+            console.error('No se encontraron los elementos de género');
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

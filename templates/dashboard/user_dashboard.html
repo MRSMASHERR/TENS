@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Sistema Médico INACAP{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Encabezado -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">¡Bienvenido, {{ user.get_full_name }}!</h1>
+        {% if cursos and user.rol == 'estudiante' %}
+        {% comment %}
+        Botón de Registrar Paciente eliminado según solicitud
+        <a href="{% url 'registrar_paciente' cursos.0.id %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-user-plus fa-sm text-white-50 me-2"></i>Registrar Paciente en Curso
+        </a>
+        {% endcomment %}
+        {% endif %}
+    </div>
+
+    <!-- Tarjetas de Información -->
+    <div class="row">
+        <!-- Mis Pacientes -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Mis Pacientes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ total_pacientes }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-injured fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mis Cursos -->
+        {% if user.rol == 'docente' or user.rol == 'estudiante' %}
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                {% if user.rol == 'docente' %}Cursos que Imparto{% else %}Mis Cursos{% endif %}
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ total_cursos }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-graduation-cap fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Notificaciones -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Notificaciones
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ cantidad_notificaciones }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-bell fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="row">
+        <!-- Mis Cursos -->
+        {% if user.rol == 'docente' or user.rol == 'estudiante' %}
+        <div class="col-12 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-success text-white d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold">
+                        {% if user.rol == 'docente' %}Mis Cursos Impartidos{% else %}Mis Cursos Inscritos{% endif %}
+                    </h6>
+                    {% if user.rol == 'docente' %}
+                    <a href="{% url 'crear_curso' %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus me-1"></i> Crear Curso
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if cursos %}
+                    <div class="row">
+                        {% for curso in cursos %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 border-0 shadow-sm hover-overlay">
+                                <div class="card-body">
+                                    <h5 class="card-title d-flex justify-content-between align-items-center">
+                                        {{ curso.nombre }}
+                                        <span class="badge bg-primary rounded-pill">
+                                            {{ curso.estudiantes.count }} 
+                                            <i class="fas fa-user-graduate ms-1"></i>
+                                        </span>
+                                    </h5>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            {% if user.rol == 'estudiante' %}
+                                            Docente: {{ curso.docente.get_full_name }}
+                                            {% else %}
+                                            Estudiantes: {{ curso.estudiantes.count }}
+                                            {% endif %}
+                                        </small>
+                                    </p>
+                                    <div class="mt-3 d-grid">
+                                        <a href="{% url 'detalle_curso' curso.id %}" class="btn btn-primary">
+                                            <i class="fas fa-eye me-1"></i> Ver Curso
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-graduation-cap fa-4x text-muted mb-3"></i>
+                        <h5>
+                            {% if user.rol == 'docente' %}
+                            No tienes cursos creados
+                            {% else %}
+                            No estás inscrito en ningún curso
+                            {% endif %}
+                        </h5>
+                        {% if user.rol == 'docente' %}
+                        <p class="text-muted mb-3">Crea tu primer curso para comenzar a gestionar pacientes</p>
+                        <a href="{% url 'crear_curso' %}" class="btn btn-primary mt-2">
+                            <i class="fas fa-plus-circle me-2"></i> Crear Mi Primer Curso
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <!-- Acciones Rápidas -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">¿Qué quieres hacer hoy?</h6>
+                </div>
+                <div class="card-body">
+                    {% if cursos %}
+                    <div class="action-buttons">
+                        <a href="{% url 'lista_pacientes_curso' cursos.0.id %}" class="btn btn-info btn-lg btn-block mb-3 d-flex align-items-center justify-content-between">
+                            <span><i class="fas fa-clipboard-list me-2"></i> Ver Pacientes</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        
+                        <a href="{% url 'mis_cursos' %}" class="btn btn-primary btn-lg btn-block d-flex align-items-center justify-content-between">
+                            <span><i class="fas fa-graduation-cap me-2"></i> Mis Cursos</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        
+                        {% if user.rol == 'docente' %}
+                        <div class="dropdown-divider my-3"></div>
+                        <a href="{% url 'crear_curso' %}" class="btn btn-outline-primary btn-block">
+                            <i class="fas fa-plus-circle me-2"></i> Crear Curso Nuevo
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        {% if user.rol == 'docente' %}
+                        <p>No tienes cursos creados. Para comenzar a registrar pacientes, primero debes crear un curso.</p>
+                        <a href="{% url 'crear_curso' %}" class="btn btn-primary btn-block mt-3">
+                            <i class="fas fa-plus-circle me-2"></i> Crear Mi Primer Curso
+                        </a>
+                        {% else %}
+                        <p>No estás inscrito en ningún curso. Contacta con tu docente para obtener una invitación.</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Mis Pacientes por Curso -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold">Mis Pacientes por Curso</h6>
+                    {% if cursos %}
+                    <a href="{% url 'lista_pacientes_curso' cursos.0.id %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-external-link-alt me-1"></i> Ver Completo
+                    </a>
+                    {% else %}
+                    <button class="btn btn-light btn-sm" disabled>Ver Completo</button>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if pacientes_por_curso %}
+                        <ul class="nav nav-tabs mb-3" id="cursosTabs" role="tablist">
+                            {% for curso_info in pacientes_por_curso %}
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {% if forloop.first %}active{% endif %}" 
+                                        id="curso-{{ curso_info.curso.id }}-tab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#curso-{{ curso_info.curso.id }}" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="curso-{{ curso_info.curso.id }}" 
+                                        aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                                    {{ curso_info.curso.nombre }} 
+                                    <span class="badge bg-primary ms-1">{{ curso_info.pacientes|length }}</span>
+                                </button>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <div class="tab-content" id="cursosTabsContent">
+                            {% for curso_info in pacientes_por_curso %}
+                            <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" 
+                                 id="curso-{{ curso_info.curso.id }}" 
+                                 role="tabpanel" 
+                                 aria-labelledby="curso-{{ curso_info.curso.id }}-tab">
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="text-muted">{{ curso_info.pacientes|length }} paciente(s) registrado(s)</h6>
+                                    <a href="{% url 'registrar_paciente' curso_info.curso.id %}" class="btn btn-sm btn-success">
+                                        <i class="fas fa-plus me-1"></i> Agregar
+                                    </a>
+                                </div>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover table-sm">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>RUT</th>
+                                                <th>Sala/Cama</th>
+                                                <th class="text-center">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for paciente in curso_info.pacientes %}
+                                            <tr>
+                                                <td>{{ paciente.nombre }}</td>
+                                                <td>{{ paciente.rut }}</td>
+                                                <td>{{ paciente.sala_cama }}</td>
+                                                <td class="text-center">
+                                                    <div class="btn-group btn-group-sm">
+                                                        <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-info" title="Ver detalles">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="{% url 'editar_paciente' paciente.id %}" class="btn btn-warning" title="Editar">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div class="text-center mt-3">
+                                    <a href="{% url 'detalle_curso' curso_info.curso.id %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-graduation-cap me-1"></i> Ir al Curso
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            {% if cursos %}
+                                <i class="fas fa-user-injured fa-4x text-muted mb-3"></i>
+                                <h5>No tienes pacientes registrados en ningún curso</h5>
+                                <p class="text-muted">Comienza registrando tu primer paciente en alguno de tus cursos.</p>
+                                <a href="{% url 'registrar_paciente' cursos.0.id %}" class="btn btn-primary mt-2">
+                                    <i class="fas fa-plus-circle me-2"></i> Registrar Mi Primer Paciente
+                                </a>
+                            {% else %}
+                                <i class="fas fa-graduation-cap fa-4x text-muted mb-3"></i>
+                                <h5>No tienes cursos activos</h5>
+                                <p class="text-muted">
+                                    {% if user.rol == 'docente' %}
+                                        Crea tu primer curso para comenzar a registrar pacientes.
+                                    {% else %}
+                                        Necesitas estar inscrito en un curso para registrar pacientes.
+                                    {% endif %}
+                                </p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Activar tooltips de Bootstrap
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+</script>
+{% endblock %}
+
+{% endblock %} 

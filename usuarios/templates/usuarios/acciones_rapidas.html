@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Acciones Rápidas{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Acciones Rápidas</h2>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="row g-4">
+                        {% if user.rol == 'administrador' %}
+                            <!-- Acciones para Administrador -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                                        <h5 class="card-title">Gestión de Usuarios</h5>
+                                        <p class="card-text">Administra los usuarios del sistema</p>
+                                        <a href="{% url 'lista_usuarios' %}" class="btn btn-primary">
+                                            Ir a Usuarios
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-user-plus fa-3x text-success mb-3"></i>
+                                        <h5 class="card-title">Nuevo Usuario</h5>
+                                        <p class="card-text">Registra un nuevo usuario en el sistema</p>
+                                        <a href="{% url 'registro_usuario' %}" class="btn btn-success">
+                                            Registrar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if user.rol == 'docente' %}
+                            <!-- Acciones para Docente -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-chalkboard-teacher fa-3x text-primary mb-3"></i>
+                                        <h5 class="card-title">Mis Cursos</h5>
+                                        <p class="card-text">Gestiona tus cursos y estudiantes</p>
+                                        <a href="{% url 'lista_cursos' %}" class="btn btn-primary">
+                                            Ver Cursos
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-plus-circle fa-3x text-success mb-3"></i>
+                                        <h5 class="card-title">Nuevo Curso</h5>
+                                        <p class="card-text">Crea un nuevo curso</p>
+                                        <a href="{% url 'crear_curso' %}" class="btn btn-success">
+                                            Crear
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if user.rol == 'estudiante' %}
+                            <!-- Acciones para Estudiante -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-book fa-3x text-primary mb-3"></i>
+                                        <h5 class="card-title">Mis Cursos</h5>
+                                        <p class="card-text">Accede a tus cursos inscritos</p>
+                                        <a href="{% url 'mis_cursos' %}" class="btn btn-primary">
+                                            Ver Cursos
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Acciones Comunes -->
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-circle fa-3x text-info mb-3"></i>
+                                    <h5 class="card-title">Mi Perfil</h5>
+                                    <p class="card-text">Gestiona tu información personal</p>
+                                    <a href="{% url 'perfil_usuario' %}" class="btn btn-info">
+                                        Ver Perfil
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-cog fa-3x text-secondary mb-3"></i>
+                                    <h5 class="card-title">Configuración</h5>
+                                    <p class="card-text">Ajusta las preferencias del sistema</p>
+                                    <a href="{% url 'configuracion' %}" class="btn btn-secondary">
+                                        Configurar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Balance Hídrico - {{ paciente.nombre }} - Sistema Médico INACAP{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'lista_pacientes' %}">Pacientes</a></li>
+<li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+<li class="breadcrumb-item active">Registrar Balance Hídrico</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2">Registrar Balance Hídrico</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+                    <li class="breadcrumb-item active">Registrar Balance Hídrico</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Información del Paciente -->
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Información del Paciente</h6>
+                    <p class="mb-1"><strong>Nombre:</strong> {{ paciente.nombre }}</p>
+                    <p class="mb-1"><strong>RUT:</strong> {{ paciente.rut }}</p>
+                    <p class="mb-1"><strong>Edad:</strong> {{ paciente.edad }} años</p>
+                    <p class="mb-1"><strong>Sala/Cama:</strong> {{ paciente.sala_cama }}</p>
+                    <p class="mb-0"><strong>Días Hospitalización:</strong> {{ paciente.dias_hospitalizacion }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de Balance -->
+        <div class="col-md-9">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Registro de Balance Hídrico</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Hora del registro -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <label for="id_hora" class="form-label">Hora del registro</label>
+                                {{ form.hora }}
+                            </div>
+                        </div>
+
+                        <!-- Ingresos -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5>Ingresos</h5>
+                                <hr>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="id_agua" class="form-label">Agua (ml)</label>
+                                {{ form.agua }}
+                                <div class="invalid-feedback">
+                                    Por favor ingrese un valor válido
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="id_soluciones" class="form-label">Soluciones (ml)</label>
+                                {{ form.soluciones }}
+                                <div class="invalid-feedback">
+                                    Por favor ingrese un valor válido
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="id_alimentos" class="form-label">Alimentos (ml)</label>
+                                {{ form.alimentos }}
+                                <div class="invalid-feedback">
+                                    Por favor ingrese un valor válido
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="id_medicamentos_sueros" class="form-label">Medicamentos/Sueros (ml)</label>
+                                {{ form.medicamentos_sueros }}
+                                <div class="invalid-feedback">
+                                    Por favor ingrese un valor válido
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Total Ingresos (ml)</label>
+                                <input type="number" class="form-control" id="total_ingresos" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Egresos -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5>Egresos</h5>
+                                <hr>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <label for="id_orina" class="form-label">Orina (ml)</label>
+                                {{ form.orina }}
+                                <div class="invalid-feedback">
+                                    Por favor ingrese un valor válido
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label for="id_hemoderivado" class="form-label">Hemoderivado (ml)</label>
+                                {{ form.hemoderivado }}
+                                <div class="invalid-feedback">
+                                    Por favor ingrese un valor válido
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label for="id_drenaje" class="form-label">Drenaje (ml)</label>
+                                {{ form.drenaje }}
+                                <div class="invalid-feedback">
+                                    Por favor ingrese un valor válido
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Deposiciones</label>
+                                <div class="mt-2">
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" name="deposiciones" value="+" id="deposiciones_presente" {% if form.deposiciones.value == "+" %}checked{% endif %} class="form-check-input">
+                                        <label for="deposiciones_presente" class="form-check-label">Presente (+)</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" name="deposiciones" value="-" id="deposiciones_ausente" {% if form.deposiciones.value == "-" or not form.deposiciones.value %}checked{% endif %} class="form-check-input">
+                                        <label for="deposiciones_ausente" class="form-check-label">Ausente (-)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Vómito</label>
+                                <div class="mt-2">
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" name="vomito" value="+" id="vomito_presente" {% if form.vomito.value == "+" %}checked{% endif %} class="form-check-input">
+                                        <label for="vomito_presente" class="form-check-label">Presente (+)</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" name="vomito" value="-" id="vomito_ausente" {% if form.vomito.value == "-" or not form.vomito.value %}checked{% endif %} class="form-check-input">
+                                        <label for="vomito_ausente" class="form-check-label">Ausente (-)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Total Egresos (ml)</label>
+                                <input type="number" class="form-control" id="total_egresos" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Balance Total -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5>Balance</h5>
+                                <hr>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">Balance Total (ml)</label>
+                                <input type="number" class="form-control" id="balance_total" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label for="id_observaciones" class="form-label">Observaciones</label>
+                                {{ form.observaciones }}
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Guardar Balance Hídrico
+                                </button>
+                                <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Validación del formulario
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+
+// Seleccionar automáticamente la hora más cercana
+document.addEventListener('DOMContentLoaded', function() {
+    // Definir las horas disponibles
+    const horasDisponibles = ['09:00', '13:00', '17:00', '21:00', '01:00', '06:00'];
+    
+    // Obtener la hora actual
+    const ahora = new Date();
+    const horaActual = ahora.getHours();
+    const minutosActual = ahora.getMinutes();
+    
+    // Función para calcular la diferencia entre dos horas (en minutos)
+    function calcularDiferenciaMinutos(hora1, hora2) {
+        const [hora1H, hora1M] = hora1.split(':').map(Number);
+        const [hora2H, hora2M] = hora2.split(':').map(Number);
+        
+        // Convertir ambas horas a minutos desde la medianoche
+        let minutos1 = hora1H * 60 + hora1M;
+        let minutos2 = hora2H * 60 + hora2M;
+        
+        // Manejar el caso especial cuando una hora es PM y otra AM
+        if (Math.abs(minutos1 - minutos2) > 12 * 60) {
+            if (minutos1 > minutos2) {
+                minutos2 += 24 * 60;
+            } else {
+                minutos1 += 24 * 60;
+            }
+        }
+        
+        return Math.abs(minutos1 - minutos2);
+    }
+    
+    // Convertir hora actual a formato HH:MM
+    const horaActualFormato = `${horaActual.toString().padStart(2, '0')}:${minutosActual.toString().padStart(2, '0')}`;
+    
+    // Encontrar la hora disponible más cercana
+    let horaMasCercana = horasDisponibles[0];
+    let menorDiferencia = calcularDiferenciaMinutos(horaActualFormato, horasDisponibles[0]);
+    
+    for (let i = 1; i < horasDisponibles.length; i++) {
+        const diferencia = calcularDiferenciaMinutos(horaActualFormato, horasDisponibles[i]);
+        if (diferencia < menorDiferencia) {
+            menorDiferencia = diferencia;
+            horaMasCercana = horasDisponibles[i];
+        }
+    }
+    
+    // Seleccionar la hora más cercana en el dropdown
+    const selectHora = document.getElementById('id_hora');
+    if (selectHora) {
+        for (let i = 0; i < selectHora.options.length; i++) {
+            if (selectHora.options[i].value === horaMasCercana) {
+                selectHora.selectedIndex = i;
+                break;
+            }
+        }
+    }
+});
+
+// Cálculo automático de totales
+function calcularTotales() {
+    // Calcular total de ingresos
+    let ingresos = Array.from(document.getElementsByClassName('ingreso'))
+        .map(input => parseInt(input.value) || 0)
+        .reduce((a, b) => a + b, 0);
+    document.getElementById('total_ingresos').value = ingresos;
+
+    // Calcular total de egresos
+    let egresos = [
+        parseInt(document.getElementById('id_orina').value) || 0,
+        parseInt(document.getElementById('id_hemoderivado').value) || 0,
+        parseInt(document.getElementById('id_drenaje').value) || 0
+    ].reduce((a, b) => a + b, 0);
+    document.getElementById('total_egresos').value = egresos;
+
+    // Calcular balance total
+    let balance = ingresos - egresos;
+    let balanceInput = document.getElementById('balance_total');
+    balanceInput.value = balance;
+    balanceInput.classList.remove('text-success', 'text-danger');
+    balanceInput.classList.add(balance >= 0 ? 'text-success' : 'text-danger');
+}
+
+// Agregar event listeners a todos los campos de ingreso y egreso
+document.querySelectorAll('.ingreso').forEach(input => {
+    input.addEventListener('input', calcularTotales);
+});
+document.querySelectorAll('.egreso').forEach(input => {
+    input.addEventListener('input', calcularTotales);
+});
+
+// Calcular totales iniciales
+calcularTotales();
+
+// Prevenir envío del formulario al presionar Enter
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    
+    form.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}Vista Previa Ficha Clínica - {{ paciente.nombre }}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'lista_pacientes' %}">Pacientes</a></li>
+<li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+<li class="breadcrumb-item active">Vista Previa Ficha Clínica</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2">Ficha Clínica</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+                    <li class="breadcrumb-item active">Ficha Clínica</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+            <a href="?download=true" class="btn btn-primary">
+                <i class="fas fa-download me-2"></i>Descargar PDF
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Seleccionar Fecha</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="fecha" class="form-label">Fecha de la ficha:</label>
+                            <select name="fecha" id="fecha" class="form-select">
+                                {% for fecha in fechas_disponibles %}
+                                    <option value="{{ fecha|date:'Y-m-d' }}" {% if fecha == fecha_seleccionada %}selected{% endif %}>
+                                        {{ fecha|date:"d/m/Y" }}
+                                    </option>
+                                {% empty %}
+                                    <option value="{{ fecha_seleccionada|date:'Y-m-d' }}">{{ fecha_seleccionada|date:"d/m/Y" }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Cargar Ficha
+                            </button>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <a href="{% url 'ficha_clinica' paciente.id %}?fecha={{ fecha_seleccionada|date:'Y-m-d' }}&download=true" class="btn btn-danger">
+                                <i class="fas fa-file-pdf"></i> Descargar PDF
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Vista Previa de Datos para Ficha del {{ fecha_seleccionada|date:"d/m/Y" }}</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Información del paciente -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2">Información del Paciente</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Nombre:</strong> {{ paciente.nombre }}</p>
+                                <p><strong>RUT:</strong> {{ paciente.rut }}</p>
+                                <p><strong>Edad:</strong> {{ paciente.edad }} años</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Sala/Cama:</strong> {{ paciente.sala_cama }}</p>
+                                <p><strong>Días de Hospitalización:</strong> {{ paciente.dias_hospitalizacion }}</p>
+                                <p><strong>Fecha de Ingreso:</strong> {{ paciente.fecha_ingreso|date:"d/m/Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dispositivos -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2">Dispositivos</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Vías Venosas:</strong> {{ paciente.vias_venosas|default:"No registrado" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Catéter Urinario:</strong> {{ paciente.cateter_urinario|default:"No registrado" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Signos Vitales -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2">Signos Vitales</h5>
+                        {% if signos_vitales %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped small">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Hora</th>
+                                        <th>Presión Arterial</th>
+                                        <th>FC</th>
+                                        <th>Saturación</th>
+                                        <th>FiO2</th>
+                                        <th>FR</th>
+                                        <th>Temperatura</th>
+                                        <th>HGT</th>
+                                        <th>EVA</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for signo in signos_vitales %}
+                                    <tr>
+                                        <td>{{ signo.hora }}</td>
+                                        <td>{{ signo.presion_arterial }}</td>
+                                        <td>{{ signo.frecuencia_cardiaca }}</td>
+                                        <td>{{ signo.saturacion }}%</td>
+                                        <td>{{ signo.fio2|default:"-" }}</td>
+                                        <td>{{ signo.frecuencia_respiratoria }}</td>
+                                        <td>{{ signo.temperatura }}°C</td>
+                                        <td>{{ signo.hgt|default:"-" }}</td>
+                                        <td>{{ signo.eva|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No hay registros de signos vitales para esta fecha.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Balance Hídrico -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2">Balance Hídrico</h5>
+                        {% if balances %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped small">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Hora</th>
+                                        <th colspan="3" class="text-center">Ingresos</th>
+                                        <th colspan="3" class="text-center">Egresos</th>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <th>Agua</th>
+                                        <th>Soluciones</th>
+                                        <th>Alimentos</th>
+                                        <th>Orina</th>
+                                        <th>Deposiciones</th>
+                                        <th>Vómito</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for balance in balances %}
+                                    <tr>
+                                        <td>{{ balance.hora }}</td>
+                                        <td>{{ balance.agua }}</td>
+                                        <td>{{ balance.soluciones }}</td>
+                                        <td>{{ balance.alimentos }}</td>
+                                        <td>{{ balance.orina }}</td>
+                                        <td>{{ balance.deposiciones }}</td>
+                                        <td>{{ balance.vomito }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No hay registros de balance hídrico para esta fecha.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Evoluciones -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2">Evoluciones</h5>
+                        {% if evoluciones %}
+                            {% for evolucion in evoluciones %}
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <strong>{{ evolucion.hora }}</strong> - Registrado por: {{ evolucion.responsable.get_full_name|default:evolucion.responsable.username }}
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted">Indicaciones:</h6>
+                                    <p class="card-text">{{ evolucion.indicaciones|default:"No registrado" }}</p>
+                                    
+                                    <h6 class="card-subtitle mb-2 text-muted">Observaciones:</h6>
+                                    <p class="card-text">{{ evolucion.registro|default:"No registrado" }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <p class="text-muted">No hay registros de evoluciones para esta fecha.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Actualizar automáticamente al cambiar la fecha
+        document.getElementById('fecha').addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+</script>
+{% endblock %} 

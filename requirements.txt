@@ -1,0 +1,40 @@
+# Framework y componentes principales
+Django==5.1.7
+reportlab==4.1.0
+pillow==10.2.0
+
+# Base de datos
+mysqlclient==2.2.4
+
+# Interfaz de usuario y Frontend
+whitenoise==6.6.0       # Para servir archivos estáticos
+django-crispy-forms==2.1  # Mejores formularios
+crispy-bootstrap5==2023.10  # Integración con Bootstrap 5
+
+# Generación de PDFs y exportación
+WeasyPrint==60.2         # HTML a PDF avanzado
+pdfkit==1.0.0            # Alternativa para PDFs
+
+# Procesamiento de fechas y horas
+python-dateutil==2.8.2
+
+# Utilidades
+pytz==2024.1
+sqlparse==0.4.4
+asgiref==3.7.2
+tzdata==2024.1
+
+# Solicitudes HTTP
+requests==2.31.0
+urllib3==2.0.7
+idna==3.6
+charset-normalizer==3.3.2
+certifi==2023.11.17
+
+# Desarrollo y debugging (no necesarios en producción)
+django-debug-toolbar==4.2.0  # Barra de depuración
+django-extensions==3.2.3     # Extensiones útiles para desarrollo 
+
+# Seguridad
+django-cors-headers==4.3.1
+djangorestframework==3.14.0 

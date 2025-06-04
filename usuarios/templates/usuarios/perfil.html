@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Perfil{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Información del Perfil -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-body text-center">
+                    <img src="{% static 'usuarios/img/default-avatar.png' %}" alt="Avatar" class="rounded-circle img-fluid mb-3" style="width: 150px;">
+                    <h3 class="card-title">{{ user.get_full_name }}</h3>
+                    <p class="text-muted">{{ user.get_rol_display }}</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'editar_perfil' %}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Editar Perfil
+                        </a>
+                        <a href="{% url 'password_change' %}" class="btn btn-warning">
+                            <i class="fas fa-key"></i> Cambiar Contraseña
+                        </a>
+                        <a href="{% url 'configuracion' %}" class="btn btn-secondary">
+                            <i class="fas fa-cog"></i> Configuración
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notificaciones -->
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Notificaciones</h5>
+                    <div class="d-grid">
+                        <a href="{% url 'mis_notificaciones' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-bell"></i> Ver Notificaciones
+                            {% if notificaciones_no_leidas %}
+                                <span class="badge bg-danger">{{ notificaciones_no_leidas|length }}</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalles del Usuario -->
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Información Personal</h4>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="mb-0">Nombre Completo</h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ user.get_full_name }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="mb-0">Email</h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ user.email }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="mb-0">RUT</h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ user.rut|default:"No especificado" }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="mb-0">Rol</h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            {{ user.get_rol_display }}
+                        </div>
+                    </div>
+
+                    {% with perfil_info=user.get_perfil_info %}
+                        {% if user.rol == 'docente' %}
+                            <hr>
+                            <h4 class="card-title mb-4">Información Profesional</h4>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <h6 class="mb-0">Especialidad</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary">
+                                    {{ perfil_info.especialidad }}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <h6 class="mb-0">Título Profesional</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary">
+                                    {{ perfil_info.titulo }}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <h6 class="mb-0">Años de Experiencia</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary">
+                                    {{ perfil_info.experiencia }}
+                                </div>
+                            </div>
+                        {% elif user.rol == 'estudiante' %}
+                            <hr>
+                            <h4 class="card-title mb-4">Información Académica</h4>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <h6 class="mb-0">Matrícula</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary">
+                                    {{ perfil_info.matricula }}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <h6 class="mb-0">Año de Ingreso</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary">
+                                    {{ perfil_info.ano_ingreso }}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <h6 class="mb-0">Semestre Actual</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary">
+                                    {{ perfil_info.semestre }}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

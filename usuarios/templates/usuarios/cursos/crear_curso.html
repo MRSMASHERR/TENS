@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Crear Nuevo Curso{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'lista_cursos' %}">Cursos</a></li>
+<li class="breadcrumb-item active">Crear Curso</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0 rounded-lg mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-chalkboard-teacher me-2"></i>Crear Nuevo Curso</h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead mb-4">Complete el formulario para crear un nuevo curso. Los estudiantes podrán ser invitados una vez creado el curso.</p>
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.nombre.id_for_label }}" class="form-label fw-bold">{{ form.nombre.label }}</label>
+                                {{ form.nombre }}
+                                {% if form.nombre.help_text %}
+                                    <div class="form-text">{{ form.nombre.help_text }}</div>
+                                {% endif %}
+                                {% if form.nombre.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.nombre.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.descripcion.id_for_label }}" class="form-label fw-bold">{{ form.descripcion.label }}</label>
+                                {{ form.descripcion }}
+                                {% if form.descripcion.help_text %}
+                                    <div class="form-text">{{ form.descripcion.help_text }}</div>
+                                {% endif %}
+                                {% if form.descripcion.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.descripcion.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if is_admin %}
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="docente_id" class="form-label fw-bold">Asignar Docente</label>
+                                <select name="docente_id" id="docente_id" class="form-select">
+                                    <option value="">-- Seleccione un docente (opcional) --</option>
+                                    {% for docente in docentes %}
+                                    <option value="{{ docente.id }}">{{ docente.get_full_name }} ({{ docente.email }})</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Si no selecciona un docente, usted será asignado como docente del curso.</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <div class="form-check mb-2">
+                                    {{ form.generar_codigo_manual }}
+                                    <label class="form-check-label" for="{{ form.generar_codigo_manual.id_for_label }}">
+                                        {{ form.generar_codigo_manual.label }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row codigo-container">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.codigo.id_for_label }}" class="form-label fw-bold">{{ form.codigo.label }}</label>
+                                {{ form.codigo }}
+                                {% if form.codigo.help_text %}
+                                    <div class="form-text codigo-automatico">{{ form.codigo.help_text }}</div>
+                                    <div class="form-text codigo-manual" style="display: none;">Ingrese un código único utilizando letras, números y guiones (sin espacios).</div>
+                                {% endif %}
+                                {% if form.codigo.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.codigo.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <span id="codigo-preview">El código del curso se generará automáticamente al guardar.</span>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'lista_cursos' %}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-1"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Crear Curso
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tarjeta de información adicional -->
+            <div class="card shadow border-0 rounded-lg">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>¿Cómo funcionan los cursos?</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="d-flex mb-3">
+                                <div class="pe-3">
+                                    <span class="badge bg-primary rounded-circle p-3">1</span>
+                                </div>
+                                <div>
+                                    <h6>Crear un curso</h6>
+                                    <p class="small text-muted">Cree un curso con un nombre descriptivo. El código se generará automáticamente.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex mb-3">
+                                <div class="pe-3">
+                                    <span class="badge bg-primary rounded-circle p-3">2</span>
+                                </div>
+                                <div>
+                                    <h6>Invitar estudiantes</h6>
+                                    <p class="small text-muted">Invite a los estudiantes por correo electrónico una vez creado el curso.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-6">
+                            <div class="d-flex mb-3">
+                                <div class="pe-3">
+                                    <span class="badge bg-primary rounded-circle p-3">3</span>
+                                </div>
+                                <div>
+                                    <h6>Registrar pacientes</h6>
+                                    <p class="small text-muted">Tanto usted como sus estudiantes podrán registrar pacientes asociados al curso.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex mb-3">
+                                <div class="pe-3">
+                                    <span class="badge bg-primary rounded-circle p-3">4</span>
+                                </div>
+                                <div>
+                                    <h6>Monitorear actividad</h6>
+                                    <p class="small text-muted">Supervise las actividades de sus estudiantes, incluyendo registros de signos vitales y evoluciones.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Importante:</strong> Una vez creado el curso, no se podrá modificar el código del mismo.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validación personalizada del formulario
+    var form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+    
+    // Elementos del formulario
+    var nombreInput = document.getElementById('id_nombre');
+    var codigoInput = document.getElementById('id_codigo');
+    var manualCheckbox = document.getElementById('id_generar_codigo_manual');
+    var codigoPreview = document.getElementById('codigo-preview');
+    var codigoAutoText = document.querySelector('.codigo-automatico');
+    var codigoManualText = document.querySelector('.codigo-manual');
+    
+    // Función para generar código de ejemplo basado en el nombre
+    function actualizarCodigoEjemplo() {
+        if (!nombreInput.value || manualCheckbox.checked) return;
+        
+        var nombre = nombreInput.value;
+        var palabras = nombre.match(/\b[a-zA-Z0-9]\w+/g) || [];
+        var iniciales = palabras.filter(p => p.length > 2).map(p => p[0].toUpperCase()).slice(0, 3);
+        
+        if (iniciales.length < 2) {
+            iniciales = [(nombre.substring(0, 3) || "").toUpperCase()];
+        }
+        
+        var año = new Date().getFullYear();
+        var num = Math.floor(Math.random() * 900) + 100; // número aleatorio de 3 dígitos
+        
+        var codigoEjemplo = iniciales.join('') + "-" + año + "-" + num;
+        codigoPreview.textContent = "Código sugerido: " + codigoEjemplo;
+    }
+    
+    // Función para alternar entre código manual y automático
+    function toggleManualCodigo() {
+        if (manualCheckbox.checked) {
+            codigoInput.readOnly = false;
+            codigoInput.value = '';
+            codigoInput.placeholder = 'Ingrese un código único (Ej: ENF-2025-S2)';
+            codigoAutoText.style.display = 'none';
+            codigoManualText.style.display = 'block';
+            codigoPreview.textContent = 'Ingrese un código personalizado';
+        } else {
+            codigoInput.readOnly = true;
+            codigoInput.value = '';
+            codigoInput.placeholder = 'El código se generará automáticamente';
+            codigoAutoText.style.display = 'block';
+            codigoManualText.style.display = 'none';
+            actualizarCodigoEjemplo();
+        }
+    }
+    
+    // Inicialización
+    toggleManualCodigo();
+    
+    // Eventos
+    nombreInput.addEventListener('input', actualizarCodigoEjemplo);
+    manualCheckbox.addEventListener('change', toggleManualCodigo);
+    
+    // Convertir automáticamente el código manual a mayúsculas
+    if (codigoInput) {
+        codigoInput.addEventListener('input', function() {
+            if (manualCheckbox.checked) {
+                this.value = this.value.toUpperCase().replace(/\s+/g, '-');
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

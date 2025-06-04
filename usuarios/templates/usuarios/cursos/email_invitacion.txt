@@ -1,0 +1,15 @@
+Invitación a Curso
+
+Has sido invitado al curso {{ curso.nombre }}.
+
+Detalles del curso:
+- Código: {{ curso.codigo }}
+- Docente: {{ curso.docente.get_full_name }}
+- Descripción: {{ curso.descripcion }}
+
+Para unirte al curso, visita el siguiente enlace:
+{% url 'aceptar_invitacion' codigo %}
+
+Este enlace expirará el {{ fecha_expiracion|date:"d/m/Y H:i" }}
+
+Si no esperabas esta invitación, puedes ignorar este correo. 

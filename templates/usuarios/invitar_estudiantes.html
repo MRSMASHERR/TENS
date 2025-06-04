@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Invitar Estudiantes - {{ curso.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Invitar Estudiantes al Curso: {{ curso.nombre }}</h4>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <h5 class="alert-heading">Instrucciones:</h5>
+                <ul>
+                    <li>Puedes invitar a múltiples estudiantes a la vez.</li>
+                    <li>Ingresa las direcciones de correo electrónico separadas por comas o en líneas diferentes.</li>
+                    <li>Si el estudiante ya tiene cuenta, será agregado automáticamente al curso y recibirá una notificación.</li>
+                    <li>Si el estudiante no tiene cuenta, recibirá un enlace para registrarse y será agregado al curso automáticamente.</li>
+                </ul>
+            </div>
+
+            {% if messages %}
+                <div class="messages mb-4">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group mb-3">
+                    <label for="{{ form.emails.id_for_label }}" class="form-label">{{ form.emails.label }}</label>
+                    {{ form.emails }}
+                    {% if form.emails.help_text %}
+                        <div class="form-text">{{ form.emails.help_text }}</div>
+                    {% endif %}
+                    {% if form.emails.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.emails.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-envelope me-2"></i>Enviar Invitaciones
+                    </button>
+                    <a href="{% url 'detalle_curso' curso_id=curso.id %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Volver al Curso
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

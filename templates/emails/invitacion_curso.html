@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invitación al curso: {{ curso.nombre }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #4e73df;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #f8f9fc;
+            padding: 20px;
+            border: 1px solid #e3e6f0;
+            border-radius: 0 0 5px 5px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #4e73df;
+            color: white !important;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #858796;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Invitación al Curso</h2>
+        </div>
+        <div class="content">
+            <p>Hola,</p>
+            
+            <p>Has sido invitado a unirte al curso <strong>{{ curso.nombre }}</strong> por <strong>{{ docente.get_full_name }}</strong>.</p>
+            
+            <p>Detalles del curso:</p>
+            <ul>
+                <li><strong>Nombre del curso:</strong> {{ curso.nombre }}</li>
+                <li><strong>Descripción:</strong> {{ curso.descripcion }}</li>
+                <li><strong>Docente:</strong> {{ docente.get_full_name }}</li>
+            </ul>
+            
+            <p>Para unirte al curso, haz clic en el siguiente botón:</p>
+            
+            <div style="text-align: center;">
+                <a href="{{ registro_url }}" class="button">Aceptar Invitación</a>
+            </div>
+            
+            <p>Si ya tienes una cuenta, inicia sesión con el correo electrónico al que se envió esta invitación. Si aún no tienes una cuenta, podrás registrarte con este mismo correo.</p>
+            
+            <p>Esta invitación expirará el {{ invitacion.fecha_expiracion|date:"d/m/Y H:i" }}.</p>
+            
+            <p>Si no puedes hacer clic en el botón, copia y pega el siguiente enlace en tu navegador:</p>
+            <p style="word-break: break-all; background-color: #f0f0f0; padding: 8px; border-radius: 4px;">{{ registro_url }}</p>
+        </div>
+        <div class="footer">
+            <p>Este es un mensaje automático, por favor no respondas a este correo.</p>
+            <p>© {{ curso.fecha_creacion|date:"Y" }} Sistema Médico INACAP. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html> 

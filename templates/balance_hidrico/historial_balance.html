@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}Historial de Balance Hídrico - {{ paciente.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2">Historial de Balance Hídrico</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+                    <li class="breadcrumb-item active">Historial de Balance Hídrico</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+            <a href="{% url 'registrar_balance' paciente.id %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Registrar Balance
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Información del Paciente</h6>
+                    <p class="mb-1"><strong>Nombre:</strong> {{ paciente.nombre }}</p>
+                    <p class="mb-1"><strong>RUT:</strong> {{ paciente.rut }}</p>
+                    <p class="mb-1"><strong>Edad:</strong> {{ paciente.edad }} años</p>
+                    <p class="mb-1"><strong>Sala/Cama:</strong> {{ paciente.sala_cama }}</p>
+                    <p class="mb-0"><strong>Días Hospitalización:</strong> {{ paciente.dias_hospitalizacion }}</p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Filtros</h6>
+                    <form method="get" class="mb-3">
+                        <div class="mb-3">
+                            <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" 
+                                   value="{{ fecha_inicio|date:'Y-m-d' }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" 
+                                   value="{{ fecha_fin|date:'Y-m-d' }}">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>Filtrar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Fecha y Hora</th>
+                                    <th>Ingresos (ml)</th>
+                                    <th>Orina (ml)</th>
+                                    <th>Hemoderiv. (ml)</th>
+                                    <th>Drenaje (ml)</th>
+                                    <th>Deposiciones</th>
+                                    <th>Vómito</th>
+                                    <th>Balance (ml)</th>
+                                    <th>Observaciones</th>
+                                    <th>Registrado por</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for balance in balances %}
+                                <tr>
+                                    <td>{{ balance.fecha|date:"d/m/Y" }} {{ balance.hora }}</td>
+                                    <td>{{ balance.total_ingresos }}</td>
+                                    <td>{{ balance.orina }}</td>
+                                    <td>{{ balance.hemoderivado }}</td>
+                                    <td>{{ balance.drenaje }}</td>
+                                    <td>
+                                        {% if balance.deposiciones == '+' %}
+                                            <span class="badge bg-success">Presente</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Ausente</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if balance.vomito == '+' %}
+                                            <span class="badge bg-success">Presente</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Ausente</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="{% if balance.balance_total >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {{ balance.balance_total }}
+                                    </td>
+                                    <td>{{ balance.observaciones|default:"-" }}</td>
+                                    <td>{{ balance.registrado_por.get_full_name }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="10" class="text-center">No hay registros de balance hídrico</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if balances.has_other_pages %}
+                    <nav aria-label="Paginación" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if balances.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ balances.previous_page_number }}{% if request.GET.fecha_inicio %}&fecha_inicio={{ request.GET.fecha_inicio }}{% endif %}{% if request.GET.fecha_fin %}&fecha_fin={{ request.GET.fecha_fin }}{% endif %}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in balances.paginator.page_range %}
+                            <li class="page-item {% if balances.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.fecha_inicio %}&fecha_inicio={{ request.GET.fecha_inicio }}{% endif %}{% if request.GET.fecha_fin %}&fecha_fin={{ request.GET.fecha_fin }}{% endif %}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                            {% endfor %}
+
+                            {% if balances.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ balances.next_page_number }}{% if request.GET.fecha_inicio %}&fecha_inicio={{ request.GET.fecha_inicio }}{% endif %}{% if request.GET.fecha_fin %}&fecha_fin={{ request.GET.fecha_fin }}{% endif %}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar datepickers si es necesario
+    var fechaInicio = document.getElementById('fecha_inicio');
+    var fechaFin = document.getElementById('fecha_fin');
+    
+    if (fechaInicio && !fechaInicio.value) {
+        fechaInicio.valueAsDate = new Date();
+    }
+    if (fechaFin && !fechaFin.value) {
+        fechaFin.valueAsDate = new Date();
+    }
+});
+</script>
+{% endblock %} 

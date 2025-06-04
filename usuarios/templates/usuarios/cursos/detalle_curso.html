@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ curso.nombre }} - Detalles{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Información del Curso -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="mb-0">{{ curso.nombre }}</h3>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Código: {{ curso.codigo }}</h6>
+                       
+                    <!-- Descripción del curso más destacada -->
+                    <div class="mt-3 mb-4">
+                        <h5 class="text-primary">Descripción del Curso:</h5>
+                        <div class="p-3 bg-light rounded">
+                            {% if curso.descripcion %}
+                                <p class="card-text">{{ curso.descripcion|linebreaks }}</p>
+                            {% else %}
+                                <p class="text-muted fst-italic">No hay descripción disponible para este curso.</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Botón para editar curso (solo visible para docentes del curso y admins) -->
+                        {% if user == curso.docente or user.rol == 'administrador' %}
+                        <div class="mt-2 text-end">
+                            <a href="{% url 'editar_curso' curso.id %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-edit me-1"></i>Editar Curso
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mt-3">
+                        <strong>Docente:</strong> {{ curso.docente.get_full_name }}
+                    </div>
+                    <div class="mt-2">
+                        <strong>Fecha de creación:</strong> {{ curso.fecha_creacion|date:"d/m/Y" }}
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{% url 'lista_pacientes_curso' curso.id %}" class="btn btn-primary">
+                                <i class="fas fa-hospital-user me-2"></i>Ver Pacientes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones rápidas -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-bolt me-2"></i>Acciones Rápidas</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Contador estadístico -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-start border-primary border-4 shadow-sm h-100">
+                                <div class="card-body p-3 d-flex flex-column align-items-start">
+                                    <div class="text-xs fw-bold text-primary text-uppercase mb-1">Pacientes Activos</div>
+                                    <div class="h4 mb-0 fw-bold text-gray-800">{{ total_pacientes_curso|default:"0" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-start border-success border-4 shadow-sm h-100">
+                                <div class="card-body p-3 d-flex flex-column align-items-start">
+                                    <div class="text-xs fw-bold text-success text-uppercase mb-1">Estudiantes Inscritos</div>
+                                    <div class="h4 mb-0 fw-bold text-gray-800">{{ curso.estudiantes.count }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-start border-info border-4 shadow-sm h-100">
+                                <div class="card-body p-3 d-flex flex-column align-items-start">
+                                    <div class="text-xs fw-bold text-info text-uppercase mb-1">Signos Vitales Registrados</div>
+                                    <div class="h4 mb-0 fw-bold text-gray-800">{{ signos_vitales_count|default:"0" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-start border-warning border-4 shadow-sm h-100">
+                                <div class="card-body p-3 d-flex flex-column align-items-start">
+                                    <div class="text-xs fw-bold text-warning text-uppercase mb-1">Evoluciones Registradas</div>
+                                    <div class="h4 mb-0 fw-bold text-gray-800">{{ evoluciones_count|default:"0" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 border-start border-primary border-4 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">
+                                        <i class="fas fa-user-plus me-2"></i>Pacientes
+                                    </h5>
+                                    <div class="d-grid gap-2">
+                                        <a href="{% url 'registrar_paciente' curso.id %}" class="btn btn-outline-primary">
+                                            <i class="fas fa-plus-circle me-1"></i> Registrar nuevo paciente
+                                        </a>
+                                        <a href="{% url 'lista_pacientes_alta_curso' curso.id %}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-clipboard-check me-1"></i> Ver pacientes dados de alta
+                                        </a>
+                                        <a href="{% url 'lista_pacientes_curso' curso.id %}" class="btn btn-outline-info">
+                                            <i class="fas fa-hospital-user me-1"></i> Administrar pacientes
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 border-start border-success border-4 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">
+                                        <i class="fas fa-clipboard-list me-2"></i>Gestión
+                                    </h5>
+                                    <div class="d-grid gap-2">
+                                        {% if user == curso.docente or user.rol == 'administrador' %}
+                                        <a href="{% url 'invitar_estudiantes' curso.id %}" class="btn btn-outline-success">
+                                            <i class="fas fa-user-graduate me-1"></i> Invitar estudiantes
+                                        </a>
+                                        <a href="{% url 'editar_curso' curso.id %}" class="btn btn-outline-primary">
+                                            <i class="fas fa-edit me-1"></i> Editar curso
+                                        </a>
+                                        {% else %}
+                                        <span class="text-center text-muted mb-2">
+                                            <i class="fas fa-lock me-1"></i> Gestión disponible solo para docentes
+                                        </span>
+                                        <a href="#" class="btn btn-outline-secondary disabled">
+                                            <i class="fas fa-exclamation-circle me-1"></i> Acceso restringido
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Estudiantes -->
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Estudiantes Inscritos</h4>
+                </div>
+                <div class="card-body">
+                    {% if curso.estudiantes.all %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Fecha de inscripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for estudiante in curso.estudiantes.all %}
+                                <tr>
+                                    <td>{{ estudiante.get_full_name }}</td>
+                                    <td>{{ estudiante.email }}</td>
+                                    <td>{{ estudiante.date_joined|date:"d/m/Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No hay estudiantes inscritos en este curso.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel lateral para invitaciones -->
+        <div class="col-md-4">
+            {% if user.rol == 'docente' and user == curso.docente %}
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Invitar Estudiantes</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-primary w-100">Enviar Invitación</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Invitaciones Pendientes -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Invitaciones Pendientes</h4>
+                </div>
+                <div class="card-body">
+                    {% if invitaciones_pendientes %}
+                    <div class="list-group">
+                        {% for invitacion in invitaciones_pendientes %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ invitacion.email }}</h6>
+                                <small>{{ invitacion.fecha_envio|date:"d/m/Y" }}</small>
+                            </div>
+                            <small class="text-muted">Expira: {{ invitacion.fecha_expiracion|date:"d/m/Y" }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No hay invitaciones pendientes.</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

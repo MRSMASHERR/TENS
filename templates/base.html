@@ -1,0 +1,342 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema Médico{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <a href="" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="{% if request.session.tema_oscuro %}dark-mode{% endif %}">
+    <div id="wrapper" class="d-flex">
+        <!-- Sidebar -->
+        {% if user.is_authenticated %}
+        <div id="sidebar-wrapper" class="border-right">
+            <div class="sidebar-heading d-flex align-items-center justify-content-center py-4">
+                <img src="{% static 'img/logo.svg' %}" alt="Logo" class="me-2" width="40">
+                <h5 class="m-0 fw-bold">SISTEMA MÉDICO</h5>
+            </div>
+            <div class="list-group list-group-flush sidebar-menu">
+                {% if user.rol != 'administrador' %}
+                <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-chart-line me-3"></i>
+                        <span>Inicio</span>
+                    </div>
+                </a>
+                {% endif %}
+                
+                {% if user.rol == 'administrador' %}
+                <a href="{% url 'admin_dashboard' %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-tachometer-alt me-3"></i>
+                        <span>Panel Admin</span>
+                    </div>
+                </a>
+                <a href="{% url 'lista_usuarios' %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-users-cog me-3"></i>
+                        <span>Gestión Usuarios</span>
+                    </div>
+                </a>
+                
+                <!-- Sección de Pacientes para Administrador -->
+                <div class="sidebar-heading sidebar-category my-2">
+                    <small class="text-uppercase fw-bold">Pacientes</small>
+                </div>
+                <a href="{% url 'lista_pacientes' %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-list me-3"></i>
+                        <span>Lista Pacientes</span>
+                    </div>
+                </a>
+                <a href="{% url 'lista_pacientes_alta' %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-hospital-user me-3"></i>
+                        <span>Pacientes de Alta</span>
+                    </div>
+                </a>
+                <a href="{% url 'mis_pacientes' %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-user-nurse me-3"></i>
+                        <span>Mis Pacientes</span>
+                    </div>
+                </a>
+                
+                <!-- Sección de Cursos para Administrador -->
+                <div class="sidebar-heading sidebar-category my-2">
+                    <small class="text-uppercase fw-bold">Cursos</small>
+                </div>
+                <a href="{% url 'lista_cursos' %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-chalkboard me-3"></i>
+                        <span>Todos los Cursos</span>
+                    </div>
+                </a>
+                <a href="{% url 'crear_curso' %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-plus-circle me-3"></i>
+                        <span>Crear Curso</span>
+                    </div>
+                </a>
+                
+                {% endif %}
+                
+                {% if user.rol == 'docente' %}
+                <div class="sidebar-heading sidebar-category my-2">
+                    <small class="text-uppercase fw-bold">Docencia</small>
+                </div>
+                <a href="{% url 'lista_cursos' %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-chalkboard me-3"></i>
+                        <span>Mis Cursos</span>
+                    </div>
+                </a>
+                {% endif %}
+                
+                {% if user.rol == 'estudiante' %}
+                <div class="sidebar-heading sidebar-category my-2">
+                    <small class="text-uppercase fw-bold">Estudiante</small>
+                </div>
+                <a href="{% url 'mis_cursos' %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-graduation-cap me-3"></i>
+                        <span>Mis Cursos</span>
+                    </div>
+                </a>
+                {% endif %}
+                
+                <div class="sidebar-heading sidebar-category my-2">
+                    <small class="text-uppercase fw-bold">Mi Cuenta</small>
+                </div>
+                <a href="{% url 'perfil_usuario' %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-id-badge me-3"></i>
+                        <span>Mi Perfil</span>
+                    </div>
+                </a>
+                
+                <a href="{% url 'mis_notificaciones' %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-bell me-3"></i>
+                            <span>Notificaciones</span>
+                        </div>
+                        {% if notificaciones_no_leidas %}
+                            <span class="badge rounded-pill bg-danger">{{ notificaciones_no_leidas.count }}</span>
+                        {% endif %}
+                    </div>
+                </a>
+                
+                {% if user.rol != 'administrador' %}
+                    {% if user.rol == 'docente' %}
+                    <a href="{% url 'lista_pacientes' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user-injured me-2"></i> Mis Pacientes
+                    </a>
+                    <a href="{% url 'lista_pacientes_alta' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-hospital-user me-2"></i> Pacientes Dados de Alta
+                    </a>
+                    {% elif user.rol == 'estudiante' %}
+                    <a href="{% url 'mis_pacientes' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user-injured me-2"></i> Mis Pacientes
+                    </a>
+                    <a href="{% url 'lista_pacientes_alta' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-hospital-user me-2"></i> Pacientes Dados de Alta
+                    </a>
+                    {% endif %}
+                {% endif %}
+                
+                <div class="mt-auto">
+                    <form action="{% url 'logout' %}" method="post" class="list-group-item list-group-item-action logout-btn">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link text-danger w-100 text-start p-0">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-sign-out-alt me-3"></i>
+                                <span>Cerrar Sesión</span>
+                            </div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper" class="flex-grow-1">
+            <!-- Top Navigation -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+                <div class="container-fluid">
+                    <button class="btn btn-link" id="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <!-- Breadcrumb -->
+                    <nav aria-label="breadcrumb" class="bg-light py-2 px-3 rounded">
+                        <div class="container-fluid">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item">
+                                    <a href="{% url 'dashboard' %}" class="text-decoration-none">
+                                        <i class="fas fa-home"></i> Inicio
+                                    </a>
+                                </li>
+                                {% if paciente.curso %}
+                                    <li class="breadcrumb-item">
+                                        <a href="{% url 'detalle_curso' curso_id=paciente.curso.id %}" class="text-decoration-none">
+                                            {{ paciente.curso.nombre }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if paciente %}
+                                    <li class="breadcrumb-item active">{{ paciente.nombre }}</li>
+                                {% endif %}
+                            </ol>
+                        </div>
+                    </nav>
+
+                    {% if user.is_authenticated %}
+                    <ul class="navbar-nav ms-auto">
+                        <!-- Notificaciones rápidas -->
+                        <li class="nav-item dropdown me-3">
+                            <a class="nav-link" href="#" id="notificationsDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-bell fa-fw"></i>
+                                {% if notificaciones_no_leidas %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {{ notificaciones_no_leidas.count }}
+                                        <span class="visually-hidden">notificaciones no leídas</span>
+                                    </span>
+                                {% endif %}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationsDropdown">
+                                <li class="dropdown-header">Notificaciones</li>
+                                {% for notificacion in notificaciones_no_leidas|slice:":5" %}
+                                    <li>
+                                        <a class="dropdown-item notification-item" href="{% url 'mis_notificaciones' %}">
+                                            <div class="notification-content">
+                                                <div class="notification-title">{{ notificacion.titulo }}</div>
+                                                <div class="notification-timestamp">{{ notificacion.fecha_creacion|date:"d/m/Y H:i" }}</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                {% empty %}
+                                    <li><span class="dropdown-item text-center">No hay notificaciones</span></li>
+                                {% endfor %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-center" href="{% url 'mis_notificaciones' %}">Ver todas</a></li>
+                            </ul>
+                        </li>
+                        
+                        <!-- Usuario -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                               <div class="avatar-circle me-2">
+                                   <span class="initials">{{ user.get_initials }}</span>
+                               </div>
+                                <span class="d-none d-lg-inline">
+                                    {{ user.get_full_name }}
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
+                                <li>
+                                    <div class="dropdown-header">
+                                        <strong>{{ user.get_full_name }}</strong>
+                                        <div class="small text-muted">{{ user.get_rol_display }}</div>
+                                    </div>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'perfil_usuario' %}">
+                                        <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>
+                                        Perfil
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{% url 'logout' %}" method="post" class="dropdown-item">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-link text-danger p-0 w-100 text-start">
+                                            <i class="fas fa-sign-out-alt fa-sm fa-fw me-2"></i>
+                                            Cerrar Sesión
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    {% endif %}
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <div class="container-fluid py-4">
+                {% if messages %}
+                <div id="django-messages" class="messages-container mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                        <div class="d-flex align-items-center">
+                            {% if message.tags == 'success' %}
+                                <i class="fas fa-check-circle me-2"></i>
+                            {% elif message.tags == 'error' or message.tags == 'danger' %}
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                            {% elif message.tags == 'warning' %}
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% elif message.tags == 'info' %}
+                                <i class="fas fa-info-circle me-2"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom Datepicker JS -->
+    <script src="{% static 'js/custom-datepicker.js' %}"></script>
+    
+    <script>
+        // Toggle sidebar
+        document.getElementById("menu-toggle").addEventListener("click", function(e) {
+            e.preventDefault();
+            document.getElementById("wrapper").classList.toggle("toggled");
+        });
+
+        // Set active menu item based on current URL
+        document.addEventListener("DOMContentLoaded", function() {
+            const currentPath = window.location.pathname;
+            const menuItems = document.querySelectorAll('.list-group-item');
+            
+            menuItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (href === currentPath || 
+                   (currentPath.includes(href) && href !== '/' && href !== '/dashboard/')) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

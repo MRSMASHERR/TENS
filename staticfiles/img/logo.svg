@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="50" version="1.1" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .text { font: bold 24px 'Nunito', sans-serif; fill: #ffffff; }
+        .icon { fill: #ffffff; }
+    </style>
+    
+    <!-- Cruz médica -->
+    <path class="icon" d="M15,5 h10 v10 h10 v10 h-10 v10 h-10 v-10 h-10 v-10 h10 z"/>
+    
+    <!-- Texto del sistema -->
+    <text class="text" x="50" y="30">Sistema Médico</text>
+</svg> 

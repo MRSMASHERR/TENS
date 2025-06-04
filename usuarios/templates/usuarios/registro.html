@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Registro de Usuario{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Registro de Usuario</h2>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" novalidate id="registroForm">
+                        {% csrf_token %}
+                        
+                        <!-- Datos básicos de usuario -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_first_name" class="form-label">Nombre</label>
+                                <input type="text" name="first_name" class="form-control" id="id_first_name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_last_name" class="form-label">Apellido</label>
+                                <input type="text" name="last_name" class="form-control" id="id_last_name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_username" class="form-label">Nombre de usuario</label>
+                                <input type="text" name="username" class="form-control" id="id_username" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_email" class="form-label">Correo electrónico</label>
+                                <input type="email" name="email" class="form-control" id="id_email" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_rut" class="form-label">RUT</label>
+                                <input type="text" name="rut" class="form-control" id="id_rut" placeholder="12345678-9" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_rol" class="form-label">Rol</label>
+                                <select name="rol" class="form-select" id="id_rol" required>
+                                    <option value="">Seleccione un rol</option>
+                                    <option value="estudiante">Estudiante</option>
+                                    <option value="docente">Docente</option>
+                                    <option value="administrador">Administrador</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Contraseñas -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_password1" class="form-label">Contraseña</label>
+                                <input type="password" name="password1" class="form-control" id="id_password1" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_password2" class="form-label">Confirmar contraseña</label>
+                                <input type="password" name="password2" class="form-control" id="id_password2" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Campo es_paciente -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" name="es_paciente" class="form-check-input" id="id_es_paciente">
+                                    <label class="form-check-label" for="id_es_paciente">Es paciente</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos específicos para docentes -->
+                        <div id="campos_docente" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_especialidad" class="form-label">Especialidad</label>
+                                    <input type="text" name="especialidad" class="form-control" id="id_especialidad">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_titulo_profesional" class="form-label">Título Profesional</label>
+                                    <input type="text" name="titulo_profesional" class="form-control" id="id_titulo_profesional">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_anos_experiencia" class="form-label">Años de Experiencia</label>
+                                    <input type="number" name="anos_experiencia" class="form-control" id="id_anos_experiencia" min="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos específicos para estudiantes -->
+                        <div id="campos_estudiante" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_matricula" class="form-label">Matrícula</label>
+                                    <input type="text" name="matricula" class="form-control" id="id_matricula">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_ano_ingreso" class="form-label">Año de Ingreso</label>
+                                    <input type="number" name="ano_ingreso" class="form-control" id="id_ano_ingreso">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_semestre_actual" class="form-label">Semestre Actual</label>
+                                    <input type="number" name="semestre_actual" class="form-control" id="id_semestre_actual" min="1" max="12">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">Registrar Usuario</button>
+                            <a href="{% url 'lista_usuarios' %}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rolSelect = document.getElementById('id_rol');
+        const camposDocente = document.getElementById('campos_docente');
+        const camposEstudiante = document.getElementById('campos_estudiante');
+        
+        function mostrarCamposPorRol() {
+            const rolSeleccionado = rolSelect.value;
+            camposDocente.style.display = rolSeleccionado === 'docente' ? 'block' : 'none';
+            camposEstudiante.style.display = rolSeleccionado === 'estudiante' ? 'block' : 'none';
+        }
+        
+        rolSelect.addEventListener('change', mostrarCamposPorRol);
+        mostrarCamposPorRol();
+    });
+</script>
+{% endblock %}
+{% endblock %} 

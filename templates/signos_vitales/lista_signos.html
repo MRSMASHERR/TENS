@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Signos Vitales - {{ paciente.nombre }} - Sistema Médico INACAP{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2">Signos Vitales - {{ paciente.nombre }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+                    <li class="breadcrumb-item active">Signos Vitales</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{% url 'registrar_signos' paciente.id %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Registrar Signos Vitales
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Historial de Signos Vitales</h5>
+            <div class="input-group" style="width: 300px;">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar...">
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Fecha y Hora</th>
+                            <th>Presión Arterial</th>
+                            <th>Frecuencia Cardíaca</th>
+                            <th>Temperatura</th>
+                            <th>Frec. Respiratoria</th>
+                            <th>Sat. O2</th>
+                            <th>Glicemia</th>
+                            <th>Registrado por</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for signo in signos_vitales %}
+                        <tr>
+                            <td>{{ signo.fecha_hora|date:"d/m/Y H:i" }}</td>
+                            <td>{{ signo.presion_arterial }} mmHg</td>
+                            <td>{{ signo.frecuencia_cardiaca }} lpm</td>
+                            <td>{{ signo.temperatura }}°C</td>
+                            <td>{{ signo.frecuencia_respiratoria }} rpm</td>
+                            <td>{{ signo.saturacion_oxigeno }}%</td>
+                            <td>{% if signo.glicemia %}{{ signo.glicemia }} mg/dL{% else %}-{% endif %}</td>
+                            <td>{{ signo.registrado_por.get_full_name|default:signo.registrado_por.username }}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-info" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#detalleSignosModal{{ signo.id }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Modal de Detalle -->
+                        <div class="modal fade" id="detalleSignosModal{{ signo.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Detalle de Signos Vitales</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p><strong>Fecha y Hora:</strong> {{ signo.fecha_hora|date:"d/m/Y H:i" }}</p>
+                                                <p><strong>Presión Arterial:</strong> {{ signo.presion_arterial }} mmHg</p>
+                                                <p><strong>Frecuencia Cardíaca:</strong> {{ signo.frecuencia_cardiaca }} lpm</p>
+                                                <p><strong>Temperatura:</strong> {{ signo.temperatura }}°C</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><strong>Frecuencia Respiratoria:</strong> {{ signo.frecuencia_respiratoria }} rpm</p>
+                                                <p><strong>Saturación O2:</strong> {{ signo.saturacion_oxigeno }}%</p>
+                                                <p><strong>Glicemia:</strong> {% if signo.glicemia %}{{ signo.glicemia }} mg/dL{% else %}-{% endif %}</p>
+                                                <p><strong>Registrado por:</strong> {{ signo.registrado_por.get_full_name|default:signo.registrado_por.username }}</p>
+                                            </div>
+                                            {% if signo.observaciones %}
+                                            <div class="col-12">
+                                                <p><strong>Observaciones:</strong></p>
+                                                <p class="text-muted">{{ signo.observaciones|linebreaks }}</p>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center">No hay registros de signos vitales</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if signos_vitales.has_other_pages %}
+            <nav aria-label="Paginación de signos vitales" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if signos_vitales.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ signos_vitales.previous_page_number }}">Anterior</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Anterior</span>
+                    </li>
+                    {% endif %}
+
+                    {% for num in signos_vitales.paginator.page_range %}
+                    <li class="page-item {% if signos_vitales.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if signos_vitales.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ signos_vitales.next_page_number }}">Siguiente</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">Siguiente</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Búsqueda en la tabla
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        var searchText = this.value.toLowerCase();
+        var table = document.querySelector('table');
+        var rows = table.getElementsByTagName('tr');
+
+        for (var i = 1; i < rows.length; i++) {
+            var showRow = false;
+            var cells = rows[i].getElementsByTagName('td');
+            
+            for (var j = 0; j < cells.length; j++) {
+                if (cells[j].textContent.toLowerCase().indexOf(searchText) > -1) {
+                    showRow = true;
+                    break;
+                }
+            }
+            
+            rows[i].style.display = showRow ? '' : 'none';
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

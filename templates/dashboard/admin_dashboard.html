@@ -1,0 +1,467 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel de Administración - Sistema Hospital{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Encabezado del Dashboard -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Panel de Administración</h1>
+        <div>
+            <a href="{% url 'configurar_permisos_admin' %}" class="btn btn-danger btn-sm me-2">
+                <i class="fas fa-user-shield me-1"></i> Configurar Permisos Admin
+            </a>
+            <a href="{% url 'registro_usuario' %}" class="btn btn-primary btn-sm">
+                <i class="fas fa-user-plus me-1"></i> Crear Usuario
+            </a>
+        </div>
+    </div>
+
+    <!-- Nueva Sección: Vistas de Usuario -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-danger text-white">
+            <h6 class="m-0 font-weight-bold">Acceso a Vistas de Usuario (Modo Administrador)</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Gestión de Pacientes -->
+                <div class="col-md-4 mb-3">
+                    <div class="card border-left-primary h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-user-injured me-2"></i>Pacientes</h5>
+                            <div class="list-group mt-3">
+                                <a href="{% url 'lista_pacientes' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-list me-2"></i>Lista de Pacientes
+                                </a>
+                                <a href="{% url 'lista_pacientes_readonly' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-list-alt me-2"></i>Lista de Pacientes (Lectura)
+                                </a>
+                                <a href="{% url 'lista_pacientes_alta' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-clipboard-check me-2"></i>Pacientes de Alta
+                                </a>
+                                <a href="{% url 'lista_pacientes_alta_readonly' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-clipboard-list me-2"></i>Pacientes de Alta (Lectura)
+                                </a>
+                                <a href="{% url 'mis_pacientes' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-user-nurse me-2"></i>Mis Pacientes
+                                </a>
+                                <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-chart-line me-2"></i>Dashboard de Usuario
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gestión de Cursos -->
+                <div class="col-md-4 mb-3">
+                    <div class="card border-left-success h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-book me-2"></i>Cursos</h5>
+                            <div class="list-group mt-3">
+                                <a href="{% url 'lista_cursos' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-list me-2"></i>Todos los Cursos
+                                </a>
+                                <a href="{% url 'mis_cursos' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-graduation-cap me-2"></i>Mis Cursos
+                                </a>
+                                <a href="{% url 'crear_curso' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-plus-circle me-2"></i>Crear Curso
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Administración y Usuarios -->
+                <div class="col-md-4 mb-3">
+                    <div class="card border-left-warning h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-users-cog me-2"></i>Administración</h5>
+                            <div class="list-group mt-3">
+                                <a href="{% url 'lista_usuarios' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-users me-2"></i>Gestión de Usuarios
+                                </a>
+                                <a href="{% url 'registro_usuario' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-user-plus me-2"></i>Crear Usuario
+                                </a>
+                                <a href="{% url 'configurar_permisos_admin' %}" class="list-group-item list-group-item-action bg-danger text-white">
+                                    <i class="fas fa-user-shield me-2"></i>Configurar Permisos Admin
+                                </a>
+                                <a href="{% url 'verificar_estado_admin' %}" class="list-group-item list-group-item-action bg-warning text-dark">
+                                    <i class="fas fa-clipboard-check me-2"></i>Verificar Estado Admin
+                                </a>
+                                <a href="{% url 'perfil_usuario' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-user-circle me-2"></i>Mi Perfil
+                                </a>
+                                <a href="{% url 'mis_notificaciones' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-bell me-2"></i>Mis Notificaciones
+                                </a>
+                                <a href="{% url 'admin:index' %}" class="list-group-item list-group-item-action" target="_blank">
+                                    <i class="fas fa-tools me-2"></i>Panel Admin Django
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjetas de Resumen -->
+    <div class="row">
+        <!-- Total Usuarios -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Usuarios
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ total_usuarios }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Docentes -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Docentes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ total_docentes }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Estudiantes -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Estudiantes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ total_estudiantes }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-graduate fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Pacientes -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Total Pacientes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ total_pacientes }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-injured fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pacientes Activos -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Pacientes Activos
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ pacientes_activos }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-procedures fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pacientes Dados de Alta -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Pacientes Dados de Alta
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ pacientes_dados_alta }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-hospital-user fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notificaciones -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Notificaciones
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ cantidad_notificaciones }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-bell fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas y Actividad -->
+    <div class="row">
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">Acciones Rápidas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <a href="{% url 'registro_usuario' %}" class="btn btn-primary btn-lg d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-user-plus me-2"></i> Crear Nuevo Usuario</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <a href="{% url 'lista_usuarios' %}" class="btn btn-info btn-lg d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-users-cog me-2"></i> Gestionar Usuarios</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <a href="{% url 'lista_cursos' %}" class="btn btn-success btn-lg d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-book me-2"></i> Ver Todos los Cursos</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actividad Reciente -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-success text-white">
+                    <h6 class="m-0 font-weight-bold">Actividad del Sistema (30 días)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>Nuevos Pacientes</div>
+                            <div class="badge bg-primary">{{ pacientes_nuevos }}</div>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-primary" style="width: {{ barra_pacientes_nuevos }}%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>Pacientes Dados de Alta</div>
+                            <div class="badge bg-danger">{{ pacientes_altas_recientes }}</div>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-danger" style="width: {{ barra_pacientes_altas }}%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>Signos Vitales Registrados</div>
+                            <div class="badge bg-success">{{ signos_registrados }}</div>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" style="width: {{ barra_signos }}%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>Balances Hídricos</div>
+                            <div class="badge bg-info">{{ balances_registrados }}</div>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-info" style="width: {{ barra_balances }}%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>Evoluciones Registradas</div>
+                            <div class="badge bg-warning">{{ evoluciones_registradas }}</div>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-warning" style="width: {{ barra_evoluciones }}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Usuarios Más Activos -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">Usuarios Más Activos</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Rol</th>
+                                    <th>Pacientes Registrados</th>
+                                    <th>Evoluciones</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usuario in usuarios_activos %}
+                                <tr>
+                                    <td>{{ usuario.get_full_name }}</td>
+                                    <td>
+                                        <span class="badge {% if usuario.rol == 'administrador' %}bg-primary{% elif usuario.rol == 'docente' %}bg-success{% else %}bg-info{% endif %}">
+                                            {{ usuario.get_rol_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ usuario.num_pacientes }}</td>
+                                    <td>{{ usuario.num_evoluciones }}</td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            {% if usuario.activo %}
+                                            <a href="{% url 'desactivar_usuario' usuario.id %}" class="btn btn-danger" title="Desactivar">
+                                                <i class="fas fa-user-slash"></i>
+                                            </a>
+                                            {% else %}
+                                            <a href="{% url 'activar_usuario' usuario.id %}" class="btn btn-success" title="Activar">
+                                                <i class="fas fa-user-check"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No hay datos de actividad disponibles</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de gráfico de pacientes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-info text-white">
+                    <h6 class="m-0 font-weight-bold">Nuevos Pacientes por Día</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="pacientesChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Preparar datos para el gráfico de pacientes usando JSON
+        var labelsData = [];
+        var pacientesData = [];
+        
+        {% if pacientes_por_dia %}
+            {% for item in pacientes_por_dia %}
+                labelsData.push('{{ item.fecha_ingreso|date:"d/m/Y" }}');
+                pacientesData.push({{ item.total }});
+            {% endfor %}
+        {% endif %}
+        
+        // Inicializar gráfico de pacientes por día
+        if (document.getElementById('pacientesChart')) {
+            var ctx = document.getElementById('pacientesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labelsData,
+                    datasets: [{
+                        label: 'Nuevos Pacientes',
+                        data: pacientesData,
+                        backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                        borderColor: 'rgba(78, 115, 223, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointBackgroundColor: 'rgba(78, 115, 223, 1)'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            precision: 0
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %} 

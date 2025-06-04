@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Signos Vitales - Sistema Médico INACAP{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Encabezado mejorado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-2">
+                <i class="fas fa-heartbeat text-primary me-2"></i>Registrar Signos Vitales
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+                    <li class="breadcrumb-item active">Registrar Signos Vitales</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- Información del Paciente -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-circle me-2"></i>Información del Paciente
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-user-circle fa-2x text-primary me-3"></i>
+                        <div>
+                            <h6 class="mb-1">{{ paciente.nombre }}</h6>
+                            <small class="text-muted">{{ paciente.rut }}</small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-2">
+                                <i class="fas fa-bed text-muted me-2"></i>
+                                <small>Sala/Cama:</small><br>
+                                <strong>{{ paciente.sala_cama }}</strong>
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-2">
+                                <i class="fas fa-calendar-alt text-muted me-2"></i>
+                                <small>Días Hosp.:</small><br>
+                                <strong>{{ paciente.dias_hospitalizacion }}</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rangos Normales -->
+        <div class="col-md-8">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Rangos Normales de los Signos Vitales
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <h6 class="text-primary mb-2">
+                                    <i class="fas fa-heartbeat me-2"></i>Presión Arterial
+                                </h6>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-1">Sistólica: 90 a 139 mmHg</li>
+                                    <li>Diastólica: 60 a 89 mmHg</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <h6 class="text-primary mb-2">
+                                    <i class="fas fa-heart me-2"></i>Frecuencia Cardíaca
+                                </h6>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li>Normal: 60 a 90 lpm</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <h6 class="text-primary mb-2">
+                                    <i class="fas fa-lungs me-2"></i>Saturación
+                                </h6>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li>Normal: 95% a 100%</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <h6 class="text-primary mb-2">
+                                    <i class="fas fa-wind me-2"></i>Frecuencia Respiratoria
+                                </h6>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li>Normal: 12 a 20 rpm</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <h6 class="text-primary mb-2">
+                                    <i class="fas fa-thermometer-half me-2"></i>Temperatura
+                                </h6>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-1">Hipotermia: < 36°C</li>
+                                    <li class="mb-1">Normal: 36° a 36.9°C</li>
+                                    <li class="mb-1">Subfebril: 37° a 37.3°C</li>
+                                    <li class="mb-1">Febril: 37.4° a 38.5°C</li>
+                                    <li>Hipertermia: > 38.5°C</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <h6 class="text-primary mb-2">
+                                    <i class="fas fa-tint me-2"></i>Glicemia Capilar
+                                </h6>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-1">En ayunas: 60 a 110 mg/dL (normal)</li>
+                                    <li class="mb-1">En ayunas: 110 a 125 mg/dL (observación)</li>
+                                    <li>Post Prandial: < 180 mg/dL (normal)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Registro -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-clipboard-list text-primary me-2"></i>Registro de Signos Vitales
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message|safe }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.hora }}
+                            <label for="hora">Hora de registro</label>
+                        </div>
+                        {% if form.hora.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.hora.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.presion_arterial }}
+                            <label for="presion_arterial">Presión Arterial (mmHg)</label>
+                        </div>
+                        <div class="form-text">Formato: sistólica/diastólica (ej: 120/80)</div>
+                        {% if form.presion_arterial.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.presion_arterial.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.frecuencia_cardiaca }}
+                            <label for="frecuencia_cardiaca">Frecuencia Cardíaca (lpm)</label>
+                        </div>
+                        {% if form.frecuencia_cardiaca.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.frecuencia_cardiaca.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.temperatura }}
+                            <label for="temperatura">Temperatura (°C)</label>
+                        </div>
+                        {% if form.temperatura.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.temperatura.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.frecuencia_respiratoria }}
+                            <label for="frecuencia_respiratoria">Frecuencia Respiratoria (rpm)</label>
+                        </div>
+                        {% if form.frecuencia_respiratoria.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.frecuencia_respiratoria.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.saturacion }}
+                            <label for="saturacion">Saturación de Oxígeno (%)</label>
+                        </div>
+                        {% if form.saturacion.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.saturacion.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.hgt }}
+                            <label for="hgt">HGT (mg/dL)</label>
+                        </div>
+                        {% if form.hgt.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.hgt.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.estado_hgt }}
+                            <label for="estado_hgt">Estado para HGT</label>
+                        </div>
+                        <div class="form-text">Indicar si la medición es en ayunas o postprandial</div>
+                        {% if form.estado_hgt.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.estado_hgt.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            {{ form.eva }}
+                            <label for="eva">EVA (0-10)</label>
+                        </div>
+                        {% if form.eva.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.eva.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger mt-3">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Guardar Signos Vitales
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+    
+    // Seleccionar automáticamente la hora más cercana
+    const horasDisponibles = ['09:00', '13:00', '17:00', '21:00', '01:00', '07:00'];
+    
+    const ahora = new Date();
+    const horaActual = ahora.getHours();
+    const minutosActual = ahora.getMinutes();
+    
+    function calcularDiferenciaMinutos(hora1, hora2) {
+        const [hora1H, hora1M] = hora1.split(':').map(Number);
+        const [hora2H, hora2M] = hora2.split(':').map(Number);
+        
+        let minutos1 = hora1H * 60 + hora1M;
+        let minutos2 = hora2H * 60 + hora2M;
+        
+        if (Math.abs(minutos1 - minutos2) > 12 * 60) {
+            if (minutos1 > minutos2) {
+                minutos2 += 24 * 60;
+            } else {
+                minutos1 += 24 * 60;
+            }
+        }
+        
+        return Math.abs(minutos1 - minutos2);
+    }
+    
+    const horaActualFormato = `${horaActual.toString().padStart(2, '0')}:${minutosActual.toString().padStart(2, '0')}`;
+    
+    let horaMasCercana = horasDisponibles[0];
+    let menorDiferencia = calcularDiferenciaMinutos(horaActualFormato, horasDisponibles[0]);
+    
+    for (let i = 1; i < horasDisponibles.length; i++) {
+        const diferencia = calcularDiferenciaMinutos(horaActualFormato, horasDisponibles[i]);
+        if (diferencia < menorDiferencia) {
+            menorDiferencia = diferencia;
+            horaMasCercana = horasDisponibles[i];
+        }
+    }
+    
+    const selectHora = document.getElementById('id_hora');
+    if (selectHora) {
+        for (let i = 0; i < selectHora.options.length; i++) {
+            if (selectHora.options[i].value === horaMasCercana) {
+                selectHora.selectedIndex = i;
+                break;
+            }
+        }
+    }
+    
+    var hgtInput = document.getElementById('id_hgt');
+    var estadoHgtSelect = document.getElementById('id_estado_hgt');
+    var estadoHgtContainer = estadoHgtSelect.closest('.col-md-3');
+    
+    function toggleEstadoHgt() {
+        if (hgtInput.value) {
+            estadoHgtContainer.style.display = 'block';
+        } else {
+            estadoHgtContainer.style.display = 'none';
+            estadoHgtSelect.value = '';
+        }
+    }
+    
+    toggleEstadoHgt();
+    hgtInput.addEventListener('input', toggleEstadoHgt);
+
+    // Prevenir envío del formulario al presionar Enter
+    form.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %} 

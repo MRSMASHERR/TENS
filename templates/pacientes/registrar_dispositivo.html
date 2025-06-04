@@ -1,0 +1,434 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Registrar Dispositivo para {{ paciente.nombre }}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+{% if paciente.curso %}
+<li class="breadcrumb-item"><a href="{% url 'detalle_curso' paciente.curso.id %}">{{ paciente.curso.nombre }}</a></li>
+{% endif %}
+<li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+<li class="breadcrumb-item active">Registrar Dispositivo</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2">Registrar Dispositivo</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+                    {% if paciente.curso %}
+                    <li class="breadcrumb-item"><a href="{% url 'detalle_curso' paciente.curso.id %}">{{ paciente.curso.nombre }}</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">{{ paciente.nombre }}</a></li>
+                    <li class="breadcrumb-item active">Registrar Dispositivo</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Información del Paciente -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-circle me-2"></i>Información del Paciente
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4 pb-2 text-center border-bottom">
+                        <i class="fas fa-user-circle fa-3x text-primary mb-2"></i>
+                        <h5 class="fw-bold">{{ paciente.nombre }}</h5>
+                        <span class="badge bg-light text-dark">{{ paciente.rut }}</span>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-birthday-cake text-secondary me-2"></i>
+                                <div>
+                                    <span class="text-muted small d-block">Edad</span>
+                                    <strong>{{ paciente.edad }} años</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-calendar-alt text-secondary me-2"></i>
+                                <div>
+                                    <span class="text-muted small d-block">Fecha Nac.</span>
+                                    <strong>{{ paciente.fecha_nacimiento|date:"d/m/Y" }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-bed text-secondary me-2"></i>
+                                <div>
+                                    <span class="text-muted small d-block">Sala/Cama</span>
+                                    <strong>{{ paciente.sala_cama }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-clock text-secondary me-2"></i>
+                                <div>
+                                    <span class="text-muted small d-block">Días Hosp.</span>
+                                    <strong>{{ paciente.dias_hospitalizacion }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-calendar-check text-secondary me-2"></i>
+                            <div>
+                                <span class="text-muted small d-block">Fecha Ingreso</span>
+                                <strong>{{ paciente.fecha_ingreso|date:"d/m/Y" }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if paciente.alergias %}
+                    <div class="mt-3 pt-2 border-top">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                            <div>
+                                <span class="text-muted small d-block">Alergias</span>
+                                <strong class="text-danger">{{ paciente.alergias }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mt-3 pt-2 border-top">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-user-edit text-secondary me-2"></i>
+                            <div>
+                                <span class="text-muted small d-block">Registrado por</span>
+                                <strong>{{ paciente.responsable.get_full_name }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de Registro -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Datos del Dispositivo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Información Importante -->
+                    <div class="alert alert-info mb-4">
+                        <h6 class="alert-heading fw-bold mb-2">
+                            <i class="fas fa-info-circle me-2"></i>Información Importante
+                        </h6>
+                        <p class="mb-2">Para registrar un dispositivo, siga estos pasos:</p>
+                        <ol class="mb-0">
+                            <li>Seleccione la <strong>categoría del dispositivo</strong></li>
+                            <li>Seleccione el <strong>tipo específico</strong> de dispositivo</li>
+                            <li>Indique la <strong>fecha de instalación</strong></li>
+                            <li>Especifique los <strong>días de instalación</strong> (mínimo 1)</li>
+                            <li>Opcionalmente, añada la ubicación del dispositivo</li>
+                        </ol>
+                        <small class="d-block mt-2 mb-0">Nota: Los campos marcados con * son obligatorios.</small>
+                    </div>
+
+                    <form method="post" id="dispositivo-form" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Categoría y Tipo -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.categoria.id_for_label }}" class="form-label fw-bold">
+                                    Categoría del Dispositivo *
+                                </label>
+                                {{ form.categoria }}
+                                {% if form.categoria.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.categoria.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Campos de tipo específico -->
+                            <div class="col-md-6">
+                                <div id="tipo_sonda_div" style="display: none;">
+                                    <label for="{{ form.tipo_sonda.id_for_label }}" class="form-label fw-bold">
+                                        Tipo de Sonda *
+                                    </label>
+                                    {{ form.tipo_sonda }}
+                                    {% if form.tipo_sonda.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo_sonda.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div id="tipo_via_aerea_div" style="display: none;">
+                                    <label for="{{ form.tipo_via_aerea.id_for_label }}" class="form-label fw-bold">
+                                        Tipo de Vía Aérea *
+                                    </label>
+                                    {{ form.tipo_via_aerea }}
+                                    {% if form.tipo_via_aerea.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo_via_aerea.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div id="tipo_vvp_div" style="display: none;">
+                                    <label for="{{ form.tipo_vvp.id_for_label }}" class="form-label fw-bold">
+                                        Tipo de VVP *
+                                    </label>
+                                    {{ form.tipo_vvp }}
+                                    {% if form.tipo_vvp.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo_vvp.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div id="tipo_drenaje_div" style="display: none;">
+                                    <label for="{{ form.tipo_drenaje.id_for_label }}" class="form-label fw-bold">
+                                        Tipo de Drenaje *
+                                    </label>
+                                    {{ form.tipo_drenaje }}
+                                    {% if form.tipo_drenaje.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo_drenaje.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fecha y Días de Instalación -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.fecha_instalacion.id_for_label }}" class="form-label fw-bold">
+                                    Fecha de Instalación *
+                                </label>
+                                <div class="input-group">
+                                    {{ form.fecha_instalacion }}
+                                    <div class="invalid-feedback" id="fecha-error"></div>
+                                </div>
+                                {% if form.fecha_instalacion.errors %}
+                                <div class="text-danger">{{ form.fecha_instalacion.errors }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    La fecha no debe ser futura ni anterior a 15 días desde hoy.
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.dias_instalacion.id_for_label }}" class="form-label fw-bold">
+                                    Días de Instalación *
+                                </label>
+                                <div class="input-group">
+                                    {{ form.dias_instalacion }}
+                                    <div class="invalid-feedback" id="dias-error"></div>
+                                </div>
+                                {% if form.dias_instalacion.errors %}
+                                <div class="text-danger">{{ form.dias_instalacion.errors }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Entre 1 y 30 días. Determinará la fecha de retiro automático.
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Ubicación -->
+                        <div class="mb-4">
+                            <label for="{{ form.ubicacion.id_for_label }}" class="form-label fw-bold">
+                                Ubicación
+                                <small class="text-muted">(Opcional)</small>
+                            </label>
+                            {{ form.ubicacion }}
+                            {% if form.ubicacion.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.ubicacion.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Guardar Dispositivo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categoriaSelect = document.getElementById('{{ form.categoria.id_for_label }}');
+    const tipoSondaDiv = document.getElementById('tipo_sonda_div');
+    const tipoViaAereaDiv = document.getElementById('tipo_via_aerea_div');
+    const tipoVvpDiv = document.getElementById('tipo_vvp_div');
+    const tipoDrenajeDiv = document.getElementById('tipo_drenaje_div');
+    const fechaInput = document.getElementById('{{ form.fecha_instalacion.id_for_label }}');
+    const diasInput = document.getElementById('{{ form.dias_instalacion.id_for_label }}');
+    const form = document.getElementById('dispositivo-form');
+    const fechaError = document.getElementById('fecha-error');
+    const diasError = document.getElementById('dias-error');
+
+    function actualizarCamposTipo() {
+        // Ocultar todos los campos de tipo
+        tipoSondaDiv.style.display = 'none';
+        tipoViaAereaDiv.style.display = 'none';
+        tipoVvpDiv.style.display = 'none';
+        tipoDrenajeDiv.style.display = 'none';
+
+        // Mostrar el campo correspondiente según la categoría seleccionada
+        switch(categoriaSelect.value) {
+            case 'SONDA':
+                tipoSondaDiv.style.display = 'block';
+                break;
+            case 'VIA_AEREA':
+                tipoViaAereaDiv.style.display = 'block';
+                break;
+            case 'VVP':
+                tipoVvpDiv.style.display = 'block';
+                break;
+            case 'DRENAJE':
+                tipoDrenajeDiv.style.display = 'block';
+                break;
+        }
+    }
+
+    // Actualizar campos al cargar la página
+    actualizarCamposTipo();
+
+    // Actualizar campos cuando cambie la categoría
+    categoriaSelect.addEventListener('change', actualizarCamposTipo);
+
+    // Validación de la fecha de instalación
+    function validarFecha() {
+        if (!fechaInput.value) {
+            fechaInput.classList.add('is-invalid');
+            fechaError.textContent = 'La fecha de instalación es obligatoria';
+            return false;
+        }
+
+        const fechaSeleccionada = new Date(fechaInput.value);
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0); // Resetear las horas para comparar solo las fechas
+        
+        // Calcular límite de 15 días atrás
+        const limitePasado = new Date();
+        limitePasado.setDate(limitePasado.getDate() - 15);
+        limitePasado.setHours(0, 0, 0, 0);
+
+        if (fechaSeleccionada > hoy) {
+            fechaInput.classList.add('is-invalid');
+            fechaError.textContent = 'La fecha de instalación no puede ser en el futuro';
+            return false;
+        } else if (fechaSeleccionada < limitePasado) {
+            fechaInput.classList.add('is-invalid');
+            fechaError.textContent = 'La fecha de instalación no puede ser anterior a 15 días desde hoy';
+            return false;
+        } else {
+            fechaInput.classList.remove('is-invalid');
+            fechaInput.classList.add('is-valid');
+            return true;
+        }
+    }
+
+    // Validación de los días de instalación
+    function validarDias() {
+        const dias = parseInt(diasInput.value);
+        
+        if (isNaN(dias) || diasInput.value === '') {
+            diasInput.classList.add('is-invalid');
+            diasError.textContent = 'Los días de instalación son obligatorios';
+            return false;
+        } else if (dias < 1) {
+            diasInput.classList.add('is-invalid');
+            diasError.textContent = 'Los días de instalación deben ser al menos 1';
+            return false;
+        } else if (dias > 30) {
+            diasInput.classList.add('is-invalid');
+            diasError.textContent = 'Los días de instalación no pueden exceder los 30 días';
+            return false;
+        } else {
+            diasInput.classList.remove('is-invalid');
+            diasInput.classList.add('is-valid');
+            return true;
+        }
+    }
+
+    // Eventos
+    fechaInput.addEventListener('change', validarFecha);
+    diasInput.addEventListener('input', validarDias);
+
+    // Validar el formulario antes de enviar
+    form.addEventListener('submit', function(event) {
+        const fechaValida = validarFecha();
+        const diasValidos = validarDias();
+        
+        if (!fechaValida || !diasValidos) {
+            event.preventDefault(); // Evitar el envío del formulario si hay errores
+        }
+    });
+
+    // Establecer limites para el campo de fecha
+    const hoy = new Date();
+    const limitePasado = new Date();
+    limitePasado.setDate(limitePasado.getDate() - 15);
+    
+    // Formatear las fechas como YYYY-MM-DD para el atributo min/max del input date
+    const formatearFecha = (fecha) => {
+        const año = fecha.getFullYear();
+        const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+        const dia = String(fecha.getDate()).padStart(2, '0');
+        return `${año}-${mes}-${dia}`;
+    };
+    
+    fechaInput.min = formatearFecha(limitePasado);
+    fechaInput.max = formatearFecha(hoy);
+
+    // AUTOLLENAR FECHA DE INSTALACIÓN CON LA FECHA DE HOY SI ESTÁ VACÍO
+    if (!fechaInput.value) {
+        fechaInput.value = formatearFecha(hoy);
+    }
+
+    // Prevenir envío del formulario al presionar Enter
+    form.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 
