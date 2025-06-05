@@ -409,10 +409,8 @@ class CustomPasswordResetView(PasswordResetView):
         user = User.objects.filter(email=email).first()
         
         if not user:
-            # Si el usuario no existe, mostramos el mismo mensaje de éxito
-            # para no revelar qué correos existen en el sistema
-            messages.success(self.request, f"Se han enviado instrucciones a {email} si existe en nuestro sistema.")
-            return super().form_valid(form)
+            messages.error(self.request, "El correo ingresado no está registrado en el sistema.")
+            return self.form_invalid(form)
         
         try:
             # En modo DEBUG, mostrar información detallada
