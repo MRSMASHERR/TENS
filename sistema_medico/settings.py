@@ -183,18 +183,20 @@ MESSAGE_TAGS = {
 }
 
 # CSRF Configuration
-CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = False  # Cambiado para permitir HTTP en desarrollo
 CSRF_COOKIE_HTTPONLY = True
 CSRF_USE_SESSIONS = True
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
     'https://tu-app.up.railway.app',  # Cambia esto por tu URL real de Railway
 ]
 
 # Session Configuration
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
 SESSION_SAVE_EVERY_REQUEST = True
-SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = False  # Cambiado para permitir HTTP en desarrollo
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
@@ -214,9 +216,14 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'greenia.sistema@gmail.com'
-EMAIL_HOST_PASSWORD = 'oiih zpek ttpc lbek'  # Contraseña de aplicación
+EMAIL_HOST_PASSWORD = 'ratk bcvy kdqu nihy'  # Contraseña de aplicación
 DEFAULT_FROM_EMAIL = 'greenia.sistema@gmail.com'
 EMAIL_TIMEOUT = 60  # Timeout más largo (60 segundos)
+
+# Configuración adicional para depuración
+EMAIL_USE_SSL = False
+EMAIL_SSL_CERTFILE = None
+EMAIL_SSL_KEYFILE = None
 
 # Nota: Con Resend.com debes:
 # 1. Verificar tu dominio o correo electrónico antes de enviar
