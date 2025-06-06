@@ -137,29 +137,23 @@ class RegistroUsuarioView(UserPassesTestMixin, CreateView):
             print("Datos del formulario:", form.cleaned_data)
             
             usuario = form.save(commit=False)
-            # Asegurarse de que los campos específicos se guarden correctamente
             rol = form.cleaned_data.get('rol')
             print(f"Rol del usuario a crear: {rol}")
             
             if rol == 'administrador':
-                # Si es administrador, asignar permisos completos
                 usuario.is_superuser = True
                 usuario.is_staff = True
             elif rol == 'docente':
-                # Guarda campos de docente
                 usuario.especialidad = form.cleaned_data.get('especialidad', '')
                 usuario.titulo_profesional = form.cleaned_data.get('titulo_profesional', '')
                 usuario.anos_experiencia = form.cleaned_data.get('anos_experiencia', 0)
-                # Limpiar campos de estudiante
                 usuario.matricula = None
                 usuario.ano_ingreso = None
                 usuario.semestre_actual = None
             elif rol == 'estudiante':
-                # Guarda campos de estudiante
                 usuario.matricula = form.cleaned_data.get('matricula', '')
                 usuario.ano_ingreso = form.cleaned_data.get('ano_ingreso')
                 usuario.semestre_actual = form.cleaned_data.get('semestre_actual')
-                # Limpiar campos de docente
                 usuario.especialidad = None
                 usuario.titulo_profesional = None
                 usuario.anos_experiencia = None
@@ -168,7 +162,12 @@ class RegistroUsuarioView(UserPassesTestMixin, CreateView):
             usuario.save()
             print("Usuario guardado exitosamente")
             
-            messages.success(self.request, 'Usuario creado exitosamente')
+            # Enviar correo de bienvenida
+            if self.enviar_correo_bienvenida(self.request, usuario):
+                messages.success(self.request, 'Usuario creado exitosamente y correo de bienvenida enviado')
+            else:
+                messages.warning(self.request, 'Usuario creado exitosamente pero no se pudo enviar el correo de bienvenida')
+            
             return super().form_valid(form)
         except Exception as e:
             print("Error al crear usuario:", str(e))
@@ -185,6 +184,30 @@ class RegistroUsuarioView(UserPassesTestMixin, CreateView):
             for error in errors:
                 messages.error(self.request, f"{field}: {error}")
         return super().form_invalid(form)
+
+    def enviar_correo_bienvenida(self, request, usuario):
+        """Envía un correo de bienvenida al nuevo usuario"""
+        try:
+            context = {
+                'usuario': usuario,
+                'login_url': request.build_absolute_uri(reverse('login')),
+            }
+            
+            html_message = render_to_string('emails/bienvenida.html', context)
+            plain_message = strip_tags(html_message)
+            
+            send_mail(
+                subject='¡Bienvenido al Sistema Médico!',
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[usuario.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            return True
+        except Exception as e:
+            print(f"Error al enviar correo de bienvenida: {str(e)}")
+            return False
 
 class ListaUsuariosView(UserPassesTestMixin, ListView):
     model = Usuario
@@ -945,29 +968,32 @@ def enviar_notificacion_curso(usuario, curso):
 
 def enviar_email_invitacion(request, invitacion):
     """Envía un correo electrónico con la invitación al curso"""
-    context = {
-        'invitacion': invitacion,
-        'curso': invitacion.curso,
-        'docente': invitacion.curso.docente,
-        'base_url': request.build_absolute_uri('/')[:-1],  # URL base sin la barra final
-        'registro_url': request.build_absolute_uri(
-            reverse('aceptar_invitacion', args=[str(invitacion.token)])
-        ),
-    }
-    
-    # Preparar el correo
-    html_message = render_to_string('emails/invitacion_curso.html', context)
-    plain_message = strip_tags(html_message)
-    
-    # Enviar correo
-    send_mail(
-        subject=f'Invitación al curso: {invitacion.curso.nombre}',
-        message=plain_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[invitacion.email],
-        html_message=html_message,
-        fail_silently=False,
-    )
+    try:
+        context = {
+            'invitacion': invitacion,
+            'curso': invitacion.curso,
+            'docente': invitacion.curso.docente,
+            'base_url': request.build_absolute_uri('/')[:-1],
+            'registro_url': request.build_absolute_uri(
+                reverse('aceptar_invitacion', args=[str(invitacion.token)])
+            ),
+        }
+        
+        html_message = render_to_string('emails/invitacion_curso.html', context)
+        plain_message = strip_tags(html_message)
+        
+        send_mail(
+            subject=f'Invitación al curso: {invitacion.curso.nombre}',
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[invitacion.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        return True
+    except Exception as e:
+        print(f"Error al enviar correo de invitación: {str(e)}")
+        return False
 
 def registro_con_invitacion(request, token):
     """Vista para registrarse a partir de una invitación"""
@@ -1140,3 +1166,52 @@ def editar_curso(request, curso_id):
     }
     
     return render(request, 'usuarios/cursos/editar_curso.html', context)
+
+@login_required
+@user_passes_test(es_administrador)
+def verificar_configuracion_correo(request):
+    """Vista para verificar la configuración del correo electrónico"""
+    try:
+        # Verificar variables de entorno
+        config = {
+            'EMAIL_HOST': settings.EMAIL_HOST,
+            'EMAIL_PORT': settings.EMAIL_PORT,
+            'EMAIL_USE_TLS': settings.EMAIL_USE_TLS,
+            'EMAIL_HOST_USER': settings.EMAIL_HOST_USER,
+            'DEFAULT_FROM_EMAIL': settings.DEFAULT_FROM_EMAIL,
+        }
+        
+        # Intentar enviar un correo de prueba
+        test_email = request.user.email
+        context = {
+            'usuario': request.user,
+            'fecha': timezone.now(),
+        }
+        
+        html_message = render_to_string('emails/recuperar_contrasena.html', context)
+        plain_message = strip_tags(html_message)
+        
+        send_mail(
+            subject='Prueba de configuración de correo',
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[test_email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        
+        messages.success(request, 'Configuración de correo verificada exitosamente')
+        return render(request, 'usuarios/verificar_correo.html', {
+            'config': config,
+            'test_email': test_email,
+            'status': 'success'
+        })
+        
+    except Exception as e:
+        messages.error(request, f'Error en la configuración del correo: {str(e)}')
+        return render(request, 'usuarios/verificar_correo.html', {
+            'config': config,
+            'test_email': test_email,
+            'status': 'error',
+            'error': str(e)
+        })

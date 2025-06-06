@@ -1,5 +1,7 @@
-from pathlib import Path
 import os
+from dotenv import load_dotenv
+load_dotenv()
+from pathlib import Path
 import dj_database_url  # <-- Asegúrate de tenerlo en requirements.txt
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -16,7 +18,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'clave-insegura-para-dev')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Configuración de hosts permitidos
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'tens.onrender.com']
+ALLOWED_HOSTS = ['tens.onrender.com']
 
 
 # Application definition
@@ -202,15 +204,14 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # DEFAULT_FROM_EMAIL = 'greenia.sistema@gmail.com'
 
-# Configuración de correo electrónico con Gmail
+# Configuración de correo electrónico
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'greenia.sistema@gmail.com'
-EMAIL_HOST_PASSWORD = 'ratk bcvy kdqu nihy'  # Contraseña de aplicación
-DEFAULT_FROM_EMAIL = 'greenia.sistema@gmail.com'
-EMAIL_TIMEOUT = 60  # Timeout más largo (60 segundos)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
 # Configuración adicional para depuración
 EMAIL_USE_SSL = False

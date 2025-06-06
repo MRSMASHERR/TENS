@@ -19,57 +19,105 @@
                         {% endfor %}
                     {% endif %}
 
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <h5>Por favor corrija los siguientes errores:</h5>
+                            <ul>
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ field|title }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
                     <form method="post" novalidate id="registroForm">
                         {% csrf_token %}
                         
                         <!-- Datos básicos de usuario -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="id_first_name" class="form-label">Nombre</label>
-                                <input type="text" name="first_name" class="form-control" id="id_first_name" required>
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">Nombre</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.first_name.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="id_last_name" class="form-label">Apellido</label>
-                                <input type="text" name="last_name" class="form-control" id="id_last_name" required>
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">Apellido</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.last_name.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="id_username" class="form-label">Nombre de usuario</label>
-                                <input type="text" name="username" class="form-control" id="id_username" required>
+                                <label for="{{ form.username.id_for_label }}" class="form-label">Nombre de usuario</label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.username.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="id_email" class="form-label">Correo electrónico</label>
-                                <input type="email" name="email" class="form-control" id="id_email" required>
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Correo electrónico</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.email.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="id_rut" class="form-label">RUT</label>
-                                <input type="text" name="rut" class="form-control" id="id_rut" placeholder="12345678-9" required>
+                                <label for="{{ form.rut.id_for_label }}" class="form-label">RUT</label>
+                                {{ form.rut }}
+                                {% if form.rut.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.rut.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="id_rol" class="form-label">Rol</label>
-                                <select name="rol" class="form-select" id="id_rol" required>
-                                    <option value="">Seleccione un rol</option>
-                                    <option value="estudiante">Estudiante</option>
-                                    <option value="docente">Docente</option>
-                                    <option value="administrador">Administrador</option>
-                                </select>
+                                <label for="{{ form.rol.id_for_label }}" class="form-label">Rol</label>
+                                {{ form.rol }}
+                                {% if form.rol.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.rol.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         
                         <!-- Contraseñas -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="id_password1" class="form-label">Contraseña</label>
-                                <input type="password" name="password1" class="form-control" id="id_password1" required>
+                                <label for="{{ form.password1.id_for_label }}" class="form-label">Contraseña</label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.password1.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="id_password2" class="form-label">Confirmar contraseña</label>
-                                <input type="password" name="password2" class="form-control" id="id_password2" required>
+                                <label for="{{ form.password2.id_for_label }}" class="form-label">Confirmar contraseña</label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.password2.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         
@@ -77,8 +125,13 @@
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <div class="form-check">
-                                    <input type="checkbox" name="es_paciente" class="form-check-input" id="id_es_paciente">
-                                    <label class="form-check-label" for="id_es_paciente">Es paciente</label>
+                                    {{ form.es_paciente }}
+                                    <label class="form-check-label" for="{{ form.es_paciente.id_for_label }}">Es paciente</label>
+                                    {% if form.es_paciente.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.es_paciente.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -87,18 +140,33 @@
                         <div id="campos_docente" style="display: none;">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="id_especialidad" class="form-label">Especialidad</label>
-                                    <input type="text" name="especialidad" class="form-control" id="id_especialidad">
+                                    <label for="{{ form.especialidad.id_for_label }}" class="form-label">Especialidad</label>
+                                    {{ form.especialidad }}
+                                    {% if form.especialidad.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.especialidad.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="id_titulo_profesional" class="form-label">Título Profesional</label>
-                                    <input type="text" name="titulo_profesional" class="form-control" id="id_titulo_profesional">
+                                    <label for="{{ form.titulo_profesional.id_for_label }}" class="form-label">Título Profesional</label>
+                                    {{ form.titulo_profesional }}
+                                    {% if form.titulo_profesional.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.titulo_profesional.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="id_anos_experiencia" class="form-label">Años de Experiencia</label>
-                                    <input type="number" name="anos_experiencia" class="form-control" id="id_anos_experiencia" min="0">
+                                    <label for="{{ form.anos_experiencia.id_for_label }}" class="form-label">Años de Experiencia</label>
+                                    {{ form.anos_experiencia }}
+                                    {% if form.anos_experiencia.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.anos_experiencia.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -107,18 +175,33 @@
                         <div id="campos_estudiante" style="display: none;">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="id_matricula" class="form-label">Matrícula</label>
-                                    <input type="text" name="matricula" class="form-control" id="id_matricula">
+                                    <label for="{{ form.matricula.id_for_label }}" class="form-label">Matrícula</label>
+                                    {{ form.matricula }}
+                                    {% if form.matricula.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.matricula.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="id_ano_ingreso" class="form-label">Año de Ingreso</label>
-                                    <input type="number" name="ano_ingreso" class="form-control" id="id_ano_ingreso">
+                                    <label for="{{ form.ano_ingreso.id_for_label }}" class="form-label">Año de Ingreso</label>
+                                    {{ form.ano_ingreso }}
+                                    {% if form.ano_ingreso.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.ano_ingreso.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="id_semestre_actual" class="form-label">Semestre Actual</label>
-                                    <input type="number" name="semestre_actual" class="form-control" id="id_semestre_actual" min="1" max="12">
+                                    <label for="{{ form.semestre_actual.id_for_label }}" class="form-label">Semestre Actual</label>
+                                    {{ form.semestre_actual }}
+                                    {% if form.semestre_actual.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.semestre_actual.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -137,7 +220,7 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const rolSelect = document.getElementById('id_rol');
+        const rolSelect = document.getElementById('{{ form.rol.id_for_label }}');
         const camposDocente = document.getElementById('campos_docente');
         const camposEstudiante = document.getElementById('campos_estudiante');
         

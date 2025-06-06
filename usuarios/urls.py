@@ -64,4 +64,5 @@ urlpatterns = [
     path('cursos/detalle/<int:curso_id>/', views.detalle_curso, name='detalle_curso'),
     path('cursos/invitar/<int:curso_id>/', views.invitar_estudiantes, name='invitar_estudiantes'),
     path('cursos/invitacion/<str:codigo>/', views.aceptar_invitacion, name='aceptar_invitacion'),
+    path('verificar-correo/', views.verificar_configuracion_correo, name='verificar_configuracion_correo'),
 ] 

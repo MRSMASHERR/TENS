@@ -39,4 +39,7 @@ django-extensions==3.2.3     # Extensiones útiles para desarrollo
 
 # Seguridad
 django-cors-headers==4.3.1
-djangorestframework==3.14.0 
+djangorestframework==3.14.0
+
+# Environment variables
+python-dotenv 
