@@ -91,21 +91,22 @@ class RegistroUsuarioView(UserPassesTestMixin, CreateView):
         # Validamos si viene un rol en el POST para mostrar campos específicos
         if self.request.method == 'POST':
             rol = self.request.POST.get('rol')
+            print(f"Rol seleccionado en POST: {rol}")
             if rol == 'docente':
                 # Si es docente, añadir campos específicos
                 form.fields['especialidad'] = forms.CharField(
                     widget=forms.TextInput(attrs={'class': 'form-control'}),
-                    required=False,
+                    required=True,
                     label='Especialidad'
                 )
                 form.fields['titulo_profesional'] = forms.CharField(
                     widget=forms.TextInput(attrs={'class': 'form-control'}),
-                    required=False,
+                    required=True,
                     label='Título Profesional'
                 )
                 form.fields['anos_experiencia'] = forms.IntegerField(
                     widget=forms.NumberInput(attrs={'class': 'form-control'}),
-                    required=False,
+                    required=True,
                     min_value=0,
                     initial=0,
                     label='Años de Experiencia'
@@ -114,52 +115,76 @@ class RegistroUsuarioView(UserPassesTestMixin, CreateView):
                 # Si es estudiante, añadir campos específicos
                 form.fields['matricula'] = forms.CharField(
                     widget=forms.TextInput(attrs={'class': 'form-control'}),
-                    required=False,
+                    required=True,
                     label='Matrícula'
                 )
                 form.fields['ano_ingreso'] = forms.IntegerField(
                     widget=forms.NumberInput(attrs={'class': 'form-control'}),
-                    required=False,
+                    required=True,
                     label='Año de Ingreso'
                 )
                 form.fields['semestre_actual'] = forms.IntegerField(
                     widget=forms.NumberInput(attrs={'class': 'form-control'}),
-                    required=False,
+                    required=True,
                     label='Semestre Actual'
                 )
         return form
     
     def form_valid(self, form):
-        usuario = form.save(commit=False)
-        # Asegurarse de que los campos específicos se guarden correctamente
-        rol = form.cleaned_data.get('rol')
-        
-        if rol == 'administrador':
-            # Si es administrador, asignar permisos completos
-            usuario.is_superuser = True
-            usuario.is_staff = True
-        elif rol == 'docente':
-            # Guarda campos de docente
-            usuario.especialidad = form.cleaned_data.get('especialidad', '')
-            usuario.titulo_profesional = form.cleaned_data.get('titulo_profesional', '')
-            usuario.anos_experiencia = form.cleaned_data.get('anos_experiencia', 0)
-            # Limpiar campos de estudiante
-            usuario.matricula = None
-            usuario.ano_ingreso = None
-            usuario.semestre_actual = None
-        elif rol == 'estudiante':
-            # Guarda campos de estudiante
-            usuario.matricula = form.cleaned_data.get('matricula', '')
-            usuario.ano_ingreso = form.cleaned_data.get('ano_ingreso')
-            usuario.semestre_actual = form.cleaned_data.get('semestre_actual')
-            # Limpiar campos de docente
-            usuario.especialidad = None
-            usuario.titulo_profesional = None
-            usuario.anos_experiencia = None
-        
-        usuario.save()
-        messages.success(self.request, 'Usuario creado exitosamente')
-        return super().form_valid(form)
+        try:
+            from django.db import connection
+            print("Configuración de la base de datos:", connection.settings_dict)
+            print("Datos del formulario:", form.cleaned_data)
+            
+            usuario = form.save(commit=False)
+            # Asegurarse de que los campos específicos se guarden correctamente
+            rol = form.cleaned_data.get('rol')
+            print(f"Rol del usuario a crear: {rol}")
+            
+            if rol == 'administrador':
+                # Si es administrador, asignar permisos completos
+                usuario.is_superuser = True
+                usuario.is_staff = True
+            elif rol == 'docente':
+                # Guarda campos de docente
+                usuario.especialidad = form.cleaned_data.get('especialidad', '')
+                usuario.titulo_profesional = form.cleaned_data.get('titulo_profesional', '')
+                usuario.anos_experiencia = form.cleaned_data.get('anos_experiencia', 0)
+                # Limpiar campos de estudiante
+                usuario.matricula = None
+                usuario.ano_ingreso = None
+                usuario.semestre_actual = None
+            elif rol == 'estudiante':
+                # Guarda campos de estudiante
+                usuario.matricula = form.cleaned_data.get('matricula', '')
+                usuario.ano_ingreso = form.cleaned_data.get('ano_ingreso')
+                usuario.semestre_actual = form.cleaned_data.get('semestre_actual')
+                # Limpiar campos de docente
+                usuario.especialidad = None
+                usuario.titulo_profesional = None
+                usuario.anos_experiencia = None
+            
+            print("Intentando guardar usuario...")
+            usuario.save()
+            print("Usuario guardado exitosamente")
+            
+            messages.success(self.request, 'Usuario creado exitosamente')
+            return super().form_valid(form)
+        except Exception as e:
+            print("Error al crear usuario:", str(e))
+            print("Tipo de error:", type(e).__name__)
+            import traceback
+            print("Traceback completo:", traceback.format_exc())
+            messages.error(self.request, f'Error al crear usuario: {str(e)}')
+            return self.form_invalid(form)
+    
+    def form_invalid(self, form):
+        print("Formulario inválido")
+        print("Errores del formulario:", form.errors)
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(self.request, f"{field}: {error}")
+        return super().form_invalid(form)
 
 class ListaUsuariosView(UserPassesTestMixin, ListView):
     model = Usuario

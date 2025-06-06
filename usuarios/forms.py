@@ -186,33 +186,105 @@ class RegistroUsuarioForm(UserCreationForm):
         model = Usuario
         fields = ['username', 'first_name', 'last_name', 'email', 'rut', 'password1', 'password2', 'rol', 'es_paciente']
         
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Personalizar mensajes de error de validación de contraseña
+        self.fields['password1'].help_text = """
+        <ul class="text-muted">
+            <li>La contraseña debe tener al menos 8 caracteres</li>
+            <li>No puede ser una contraseña común</li>
+            <li>No puede ser completamente numérica</li>
+            <li>No puede ser similar a su información personal</li>
+        </ul>
+        """
+        self.fields['password2'].help_text = 'Ingrese la misma contraseña para verificación'
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Las contraseñas no coinciden")
+        return password2
+
+    def clean_password1(self):
+        password1 = self.cleaned_data.get("password1")
+        email = self.cleaned_data.get("email")
+        
+        if password1 and email:
+            # Obtener el nombre de usuario del email (parte antes del @)
+            email_username = email.split('@')[0].lower()
+            
+            # Verificar si la contraseña contiene el nombre de usuario del email
+            if email_username in password1.lower():
+                raise forms.ValidationError(
+                    "La contraseña no puede contener su nombre de usuario del correo electrónico. "
+                    "Por ejemplo, si su correo es 'usuario@inacap.cl', no puede usar 'usuario' en su contraseña."
+                )
+            
+            # Verificar si la contraseña es demasiado similar al email completo
+            if email.lower() in password1.lower():
+                raise forms.ValidationError(
+                    "La contraseña no puede contener su correo electrónico completo."
+                )
+        
+        return password1
+
+    def clean(self):
+        cleaned_data = super().clean()
+        print("Datos limpios del formulario:", cleaned_data)
+        
+        # Validar que los campos específicos del rol estén presentes
+        rol = cleaned_data.get('rol')
+        if rol == 'docente':
+            if not cleaned_data.get('especialidad'):
+                self.add_error('especialidad', 'La especialidad es requerida para docentes')
+            if not cleaned_data.get('titulo_profesional'):
+                self.add_error('titulo_profesional', 'El título profesional es requerido para docentes')
+        elif rol == 'estudiante':
+            if not cleaned_data.get('matricula'):
+                self.add_error('matricula', 'La matrícula es requerida para estudiantes')
+            if not cleaned_data.get('ano_ingreso'):
+                self.add_error('ano_ingreso', 'El año de ingreso es requerido para estudiantes')
+            if not cleaned_data.get('semestre_actual'):
+                self.add_error('semestre_actual', 'El semestre actual es requerido para estudiantes')
+        
+        return cleaned_data
+    
     def clean_rut(self):
         rut = self.cleaned_data.get('rut')
         if not rut:
-            return rut
-            
-        rut_validado = validar_rut(rut)
-        if not rut_validado:
-            raise forms.ValidationError('RUT inválido. Por favor verifica el número y dígito verificador')
-            
-        # Comprobar si ya existe un usuario con ese RUT
-        if Usuario.objects.filter(rut=rut_validado).exists():
-            raise forms.ValidationError('Ya existe un usuario con este RUT')
-            
-        return rut_validado
+            raise forms.ValidationError('El RUT es obligatorio')
         
+        # Validar formato del RUT
+        if not re.match(r'^\d{1,8}-[\dkK]$', rut):
+            raise forms.ValidationError('El RUT debe tener el formato correcto (ejemplo: 12345678-9)')
+        
+        # Verificar si el RUT ya existe
+        if Usuario.objects.filter(rut=rut).exists():
+            raise forms.ValidationError('Este RUT ya está registrado')
+        
+        return rut
+    
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if email and Usuario.objects.filter(email=email).exists():
-            raise forms.ValidationError('Ya existe un usuario con este correo electrónico')
-        return email
+        if not email:
+            raise forms.ValidationError('El correo electrónico es obligatorio')
         
+        # Verificar si el email ya existe
+        if Usuario.objects.filter(email=email).exists():
+            raise forms.ValidationError('Este correo electrónico ya está registrado')
+        
+        return email
+    
     def clean_username(self):
         username = self.cleaned_data.get('username')
-        if username:
-            # Verificar que no contenga caracteres especiales excepto _ y .
-            if not re.match(r'^[a-zA-Z0-9_.]+$', username):
-                raise forms.ValidationError('El nombre de usuario solo puede contener letras, números, puntos y guiones bajos')
+        if not username:
+            raise forms.ValidationError('El nombre de usuario es obligatorio')
+        
+        # Verificar si el username ya existe
+        if Usuario.objects.filter(username=username).exists():
+            raise forms.ValidationError('Este nombre de usuario ya está en uso')
+        
         return username
 
 class EditarUsuarioForm(forms.ModelForm):
