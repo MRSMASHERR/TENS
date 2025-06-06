@@ -15,7 +15,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'clave-insegura-para-dev')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'tens.onrender.com').split(',')
+# Configuración de hosts permitidos
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'tens.onrender.com']
 
 
 # Application definition
@@ -41,15 +42,18 @@ INSTALLED_APPS = [
     'dashboard',
 ]
 
+# Configuración de middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para servir archivos estáticos
+    'django.contrib.sessions.middleware.SessionMiddleware',  # Debe ir antes de CsrfViewMiddleware
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'usuarios.middleware.ConfiguracionMiddleware',
 ]
 
