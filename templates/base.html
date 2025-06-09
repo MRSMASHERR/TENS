@@ -316,32 +316,34 @@
     <script src="{% static 'js/custom-datepicker.js' %}"></script>
     
     <script>
-        // Toggle sidebar
-        document.getElementById("menu-toggle").addEventListener("click", function(e) {
-            e.preventDefault();
-            document.getElementById("wrapper").classList.toggle("toggled");
-        });
-
-        // Cerrar el sidebar al hacer clic fuera en móvil
-        document.addEventListener('click', function(event) {
-            var sidebar = document.getElementById('sidebar-wrapper');
-            var wrapper = document.getElementById('wrapper');
-            var menuToggle = document.getElementById('menu-toggle');
-            if (
-                window.innerWidth <= 768 &&
-                wrapper.classList.contains('toggled') &&
-                !sidebar.contains(event.target) &&
-                !menuToggle.contains(event.target)
-            ) {
-                wrapper.classList.remove('toggled');
-            }
-        });
-
-        // Set active menu item based on current URL
         document.addEventListener("DOMContentLoaded", function() {
+            // Toggle sidebar
+            var menuToggle = document.getElementById("menu-toggle");
+            var wrapper = document.getElementById("wrapper");
+            var sidebar = document.getElementById("sidebar-wrapper");
+
+            if (menuToggle && wrapper && sidebar) {
+                menuToggle.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    wrapper.classList.toggle("toggled");
+                });
+
+                // Cerrar el sidebar al hacer clic fuera en móvil
+                document.addEventListener('click', function(event) {
+                    if (
+                        window.innerWidth <= 768 &&
+                        wrapper.classList.contains('toggled') &&
+                        !sidebar.contains(event.target) &&
+                        !menuToggle.contains(event.target)
+                    ) {
+                        wrapper.classList.remove('toggled');
+                    }
+                });
+            }
+
+            // Set active menu item based on current URL
             const currentPath = window.location.pathname;
             const menuItems = document.querySelectorAll('.list-group-item');
-            
             menuItems.forEach(item => {
                 const href = item.getAttribute('href');
                 if (href === currentPath || 
