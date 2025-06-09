@@ -322,6 +322,21 @@
             document.getElementById("wrapper").classList.toggle("toggled");
         });
 
+        // Cerrar el sidebar al hacer clic fuera en móvil
+        document.addEventListener('click', function(event) {
+            var sidebar = document.getElementById('sidebar-wrapper');
+            var wrapper = document.getElementById('wrapper');
+            var menuToggle = document.getElementById('menu-toggle');
+            if (
+                window.innerWidth <= 768 &&
+                wrapper.classList.contains('toggled') &&
+                !sidebar.contains(event.target) &&
+                !menuToggle.contains(event.target)
+            ) {
+                wrapper.classList.remove('toggled');
+            }
+        });
+
         // Set active menu item based on current URL
         document.addEventListener("DOMContentLoaded", function() {
             const currentPath = window.location.pathname;

@@ -121,6 +121,25 @@ body {
     }
 }
 
+/* Sidebar oculto por defecto en móviles y visible solo con toggled */
+@media (max-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: calc(-1 * var(--sidebar-width));
+        position: fixed;
+        z-index: 1050;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        transition: margin 0.25s ease-out;
+    }
+    .toggled #sidebar-wrapper {
+        margin-left: 0;
+    }
+    #page-content-wrapper {
+        width: 100vw;
+    }
+}
+
 .topbar {
     height: var(--topbar-height);
     background-color: white;
