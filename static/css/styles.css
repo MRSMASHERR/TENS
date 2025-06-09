@@ -102,8 +102,40 @@ body {
     background-color: #f8f9fc;
 }
 
-.wrapper.toggled #sidebar-wrapper {
-    margin-left: 0;
+/* Sidebar oculto por defecto, visible solo con toggled */
+#wrapper:not(.toggled) #sidebar-wrapper {
+    margin-left: calc(-1 * var(--sidebar-width)) !important;
+}
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: 0 !important;
+}
+#sidebar-wrapper {
+    position: fixed;
+    z-index: 1050;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    transition: margin 0.25s ease-out;
+}
+#page-content-wrapper {
+    width: 100vw;
+    transition: margin 0.25s ease-out;
+}
+
+/* Ajuste para que el contenido se desplace cuando el menú está abierto en escritorio */
+@media (min-width: 769px) {
+    #wrapper.toggled #page-content-wrapper {
+        margin-left: var(--sidebar-width);
+    }
+    #sidebar-wrapper {
+        width: var(--sidebar-width);
+    }
+}
+
+/* El botón hamburguesa siempre visible */
+#menu-toggle {
+    display: block;
+    z-index: 2000;
 }
 
 @media (min-width: 768px) {
@@ -124,7 +156,7 @@ body {
 /* Sidebar oculto por defecto en móviles y visible solo con toggled */
 @media (max-width: 768px) {
     #sidebar-wrapper {
-        margin-left: calc(-1 * var(--sidebar-width));
+        margin-left: calc(-1 * var(--sidebar-width)) !important;
         position: fixed;
         z-index: 1050;
         height: 100vh;
@@ -133,7 +165,7 @@ body {
         transition: margin 0.25s ease-out;
     }
     .toggled #sidebar-wrapper {
-        margin-left: 0;
+        margin-left: 0 !important;
     }
     #page-content-wrapper {
         width: 100vw;
