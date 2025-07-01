@@ -31,7 +31,7 @@ sqlparse==0.4.4
 tzdata==2024.1
 
 # Solicitudes HTTP
-requests==2.31.0
+requests==2.29.0
 urllib3==2.0.7
 idna==3.6
 charset-normalizer==3.3.2
