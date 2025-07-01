@@ -97,15 +97,7 @@ FIREBASE_CONFIG = {
 # Configuración de base de datos (mantener para migración)
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ficha_doc',
-        'USER': 'root',
-        'PASSWORD': 'America345',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        }
+        'ENGINE': 'django.db.backends.dummy'
     }
 }
 
