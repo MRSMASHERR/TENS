@@ -94,10 +94,11 @@ FIREBASE_CONFIG = {
     'databaseURL': os.environ.get('FIREBASE_DATABASE_URL'),
 }
 
-# Configuración de base de datos (mantener para migración)
+# Configuración de base de datos (SQLite para migraciones)
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.dummy'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
