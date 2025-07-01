@@ -25,6 +25,9 @@ venv/
 ENV/
 env/
 .env
+serviceAccountKey.json
+*.pyc
+__pycache__/
 
 # IDE
 .idea/

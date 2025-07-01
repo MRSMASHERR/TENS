@@ -18,7 +18,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'clave-insegura-para-dev')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Configuración de hosts permitidos
-ALLOWED_HOSTS = ['tens.onrender.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'tens.onrender.com']
 
 
 # Application definition
@@ -83,23 +83,34 @@ WSGI_APPLICATION = 'sistema_medico.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL', f'sqlite:///{BASE_DIR}/db.sqlite3'))
+# Configuración de Firebase
+FIREBASE_CONFIG = {
+    'apiKey': os.environ.get('FIREBASE_API_KEY'),
+    'authDomain': os.environ.get('FIREBASE_AUTH_DOMAIN'),
+    'projectId': os.environ.get('FIREBASE_PROJECT_ID'),
+    'storageBucket': os.environ.get('FIREBASE_STORAGE_BUCKET'),
+    'messagingSenderId': os.environ.get('FIREBASE_MESSAGING_SENDER_ID'),
+    'appId': os.environ.get('FIREBASE_APP_ID'),
+    'databaseURL': os.environ.get('FIREBASE_DATABASE_URL'),
 }
 
-##DATABASES = {
-##    'default': {
-##        'ENGINE': 'django.db.backends.mysql',
-##        'NAME': 'ficha_doc',
-##        'USER': 'root',
-##        'PASSWORD': 'America345',
-##        'HOST': 'localhost',
-##        'PORT': '3306',
-##        'OPTIONS': {
-##            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-##        }
- ##   }
-##}
+# Configuración de base de datos (mantener para migración)
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ficha_doc',
+        'USER': 'root',
+        'PASSWORD': 'America345',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
+    }
+}
+
+# Configuración para usar Firebase como base de datos principal
+USE_FIREBASE = os.environ.get('USE_FIREBASE', 'False') == 'True'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

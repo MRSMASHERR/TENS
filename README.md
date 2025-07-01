@@ -62,6 +62,7 @@ python manage.py runserver
 ```
 
 El sistema estará disponible en http://127.0.0.1:8000/
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/MRSMASHERR/TENS?utm_source=oss&utm_medium=github&utm_campaign=MRSMASHERR%2FTENS&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
 ## Funcionalidades principales
 

@@ -6,6 +6,10 @@ gunicorn
 dj-database-url
 psycopg2-binary
 
+# Firebase
+firebase-admin==6.4.0
+pyrebase4==4.7.1
+
 # Base de datos
 mysqlclient==2.2.4
 
