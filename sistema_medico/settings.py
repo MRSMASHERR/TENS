@@ -17,7 +17,12 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'clave-insegura-para-dev')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Configuración de hosts permitidos
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'tens.onrender.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'tens.onrender.com', '.onrender.com']
+
+# Configuración adicional para Render
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 
 # Application definition
@@ -54,7 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # Removido debug_toolbar.middleware.DebugToolbarMiddleware para producción
     'usuarios.middleware.ConfiguracionMiddleware',
 ]
 
@@ -93,13 +98,25 @@ FIREBASE_CONFIG = {
     'databaseURL': os.environ.get('FIREBASE_DATABASE_URL'),
 }
 
-# Configuración de base de datos (SQLite para migraciones)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Configuración de base de datos
+import dj_database_url
+
+# Detectar si estamos en producción (Render)
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL and not DEBUG:
+    # Usar PostgreSQL en producción
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL)
     }
-}
+else:
+    # Usar SQLite en desarrollo
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Configuración para usar Firebase como base de datos principal
 USE_FIREBASE = os.environ.get('USE_FIREBASE', 'False') == 'True'
@@ -180,7 +197,7 @@ MESSAGE_TAGS = {
 }
 
 # CSRF Configuration
-CSRF_COOKIE_SECURE = True  # Cambiado para HTTPS en producción
+CSRF_COOKIE_SECURE = not DEBUG  # Solo True en producción
 CSRF_COOKIE_HTTPONLY = True
 CSRF_USE_SESSIONS = True
 CSRF_COOKIE_SAMESITE = 'Lax'
@@ -188,12 +205,13 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'https://tens.onrender.com',  # Dominio de Render
+    'http://tens.onrender.com',   # También permitir HTTP para desarrollo
 ]
 
 # Session Configuration
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
 SESSION_SAVE_EVERY_REQUEST = True
-SESSION_COOKIE_SECURE = True  # Cambiado para HTTPS en producción
+SESSION_COOKIE_SECURE = not DEBUG  # Solo True en producción
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
@@ -232,8 +250,20 @@ USERS_PASSWORD_RESET_EMAIL_TEMPLATE = 'emails/recuperar_contrasena.html'
 
 # Configuración de seguridad
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    # Comentado temporalmente para resolver problemas de login
+    # SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 31536000  # 1 año
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Configuración de CORS
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "https://tens.onrender.com",
+    "http://tens.onrender.com",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Solo en desarrollo

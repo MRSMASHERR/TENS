@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: sistema-medico
+    env: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+      python manage.py migrate
+    startCommand: gunicorn sistema_medico.wsgi:application
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: USE_FIREBASE
+        value: False
+      - key: ALLOWED_HOSTS
+        value: tens.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://tens.onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://tens.onrender.com
+      - key: STATICFILES_STORAGE
+        value: whitenoise.storage.CompressedManifestStaticFilesStorage
+      - key: EMAIL_BACKEND
+        value: django.core.mail.backends.console.EmailBackend
+      - key: LANGUAGE_CODE
+        value: es-cl
+      - key: TIME_ZONE
+        value: America/Santiago 

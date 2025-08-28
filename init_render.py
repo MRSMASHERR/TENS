@@ -43,24 +43,33 @@ def main():
         print("❌ Falló la recolección de estáticos")
         return False
     
-    # 3. Crear superusuario si las variables están configuradas
-    print("\n👤 Verificando creación de superusuario...")
-    username = os.environ.get('DJANGO_SUPERUSER_USERNAME')
-    email = os.environ.get('DJANGO_SUPERUSER_EMAIL')
-    password = os.environ.get('DJANGO_SUPERUSER_PASSWORD')
-    
-    if all([username, email, password]):
-        print(f"🔑 Creando superusuario: {username}")
-        if run_command(f"create_superuser_firebase --username {username} --email {email} --password {password}"):
-            print("✅ Superusuario creado exitosamente")
+    # 3. Crear superusuario automáticamente
+    print("\n👤 Creando superusuario...")
+    try:
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        
+        # Verificar si ya existe un superusuario
+        if not User.objects.filter(is_superuser=True).exists():
+            username = os.environ.get('ADMIN_USERNAME', 'admin')
+            email = os.environ.get('ADMIN_EMAIL', 'admin@sistema-medico.com')
+            password = os.environ.get('ADMIN_PASSWORD', 'admin123456')
+            
+            user = User.objects.create_superuser(
+                username=username,
+                email=email,
+                password=password,
+                first_name='Administrador',
+                last_name='Sistema',
+                rol='administrador'
+            )
+            print(f"✅ Superusuario creado: {username}")
+            print(f"   Email: {email}")
+            print(f"   Contraseña: {password}")
         else:
-            print("⚠️ No se pudo crear el superusuario (puede que ya exista)")
-    else:
-        print("⚠️ Variables de superusuario no configuradas")
-        print("Para crear un superusuario, configura estas variables de entorno:")
-        print("- DJANGO_SUPERUSER_USERNAME")
-        print("- DJANGO_SUPERUSER_EMAIL")
-        print("- DJANGO_SUPERUSER_PASSWORD")
+            print("✅ Ya existe un superusuario")
+    except Exception as e:
+        print(f"⚠️ Error al crear superusuario: {e}")
     
     print("\n🎉 Configuración completada!")
     return True
