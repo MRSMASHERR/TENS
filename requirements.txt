@@ -43,6 +43,4 @@ djangorestframework==3.14.0
 # Environment variables
 python-dotenv
 
-# Base de datos
-dj-database-url==2.1.0
-psycopg2-binary==2.9.9 
+# Base de datos (SQLite incluido con Django) 

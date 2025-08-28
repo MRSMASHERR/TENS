@@ -1,0 +1,50 @@
+services:
+  - type: web
+    name: sistema-medico-sqlite
+    env: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      python setup_sqlite.py
+    startCommand: gunicorn sistema_medico.wsgi:application
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: USE_FIREBASE
+        value: True
+      - key: ALLOWED_HOSTS
+        value: tens.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://tens.onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://tens.onrender.com
+      - key: STATICFILES_STORAGE
+        value: whitenoise.storage.CompressedManifestStaticFilesStorage
+      - key: EMAIL_BACKEND
+        value: django.core.mail.backends.console.EmailBackend
+      - key: LANGUAGE_CODE
+        value: es-cl
+      - key: TIME_ZONE
+        value: America/Santiago
+      # Variables de Firebase
+      - key: FIREBASE_API_KEY
+        value: AIzaSyAS4T6gfkIw0lgN6lrvvDBI-qr8_Eih_hA
+      - key: FIREBASE_AUTH_DOMAIN
+        value: tens-4e985.firebaseapp.com
+      - key: FIREBASE_PROJECT_ID
+        value: tens-4e985
+      - key: FIREBASE_STORAGE_BUCKET
+        value: tens-4e985.appspot.com
+      - key: FIREBASE_MESSAGING_SENDER_ID
+        value: "170026841030"
+      - key: FIREBASE_DATABASE_URL
+        value: https://tens-4e985-default-rtdb.firebaseio.com
+      # Variables de superusuario
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_EMAIL
+        value: admin@sistema-medico.com
+      - key: ADMIN_PASSWORD
+        value: admin123456 
