@@ -26,6 +26,20 @@ def run_command(command):
         return True
     except subprocess.CalledProcessError as e:
         print(f"❌ Error en {command}: {e.stderr}")
+        # Si es un error de migración, intentar con --run-syncdb
+        if 'migrate' in command and 'database' in e.stderr.lower():
+            print("🔄 Intentando con --run-syncdb...")
+            try:
+                result = subprocess.run(
+                    ['python', 'manage.py', 'migrate', '--run-syncdb'],
+                    capture_output=True,
+                    text=True,
+                    check=True
+                )
+                print(f"✅ migrate --run-syncdb: {result.stdout}")
+                return True
+            except subprocess.CalledProcessError as e2:
+                print(f"❌ Error con --run-syncdb: {e2.stderr}")
         return False
 
 def main():
@@ -34,8 +48,18 @@ def main():
     # 1. Ejecutar migraciones
     print("\n📦 Ejecutando migraciones...")
     if not run_command("migrate"):
-        print("❌ Falló la migración")
-        return False
+        print("⚠️ Migración falló, intentando configuración alternativa...")
+        # Intentar con el script de configuración robusta
+        try:
+            import setup_database
+            if setup_database.main():
+                print("✅ Configuración alternativa exitosa")
+            else:
+                print("❌ Falló la configuración alternativa")
+                return False
+        except Exception as e:
+            print(f"❌ Error en configuración alternativa: {e}")
+            return False
     
     # 2. Recolectar archivos estáticos
     print("\n📁 Recolectando archivos estáticos...")

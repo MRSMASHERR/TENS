@@ -104,13 +104,23 @@ import dj_database_url
 # Detectar si estamos en producción (Render)
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
-if DATABASE_URL and not DEBUG:
-    # Usar PostgreSQL en producción
-    DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
-    }
+if DATABASE_URL and not DEBUG and 'postgresql' in DATABASE_URL:
+    # Usar PostgreSQL en producción solo si la URL es válida
+    try:
+        DATABASES = {
+            'default': dj_database_url.parse(DATABASE_URL)
+        }
+    except Exception as e:
+        print(f"Error con PostgreSQL: {e}")
+        # Fallback a SQLite
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 else:
-    # Usar SQLite en desarrollo
+    # Usar SQLite en desarrollo y como fallback
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
