@@ -99,6 +99,19 @@ Si no configuras las variables de superusuario, se creará automáticamente con:
 2. Asegúrate de que `CSRF_TRUSTED_ORIGINS` incluya tu dominio
 3. Verifica que `DEBUG=False` en producción
 
+### No puedo ingresar con el superusuario en Render
+
+1. Asegura que el dominio de tu servicio esté incluido en CSRF:
+   - El proyecto ahora añade automáticamente `RENDER_EXTERNAL_HOSTNAME` a `CSRF_TRUSTED_ORIGINS`.
+   - Revisa los logs de Render y confirma el hostname (ej. `tens-xxxxx.onrender.com`).
+2. Resetea la contraseña del superusuario desde variables de entorno y reconstruye:
+   - Define `DJANGO_SUPERUSER_USERNAME` y `DJANGO_SUPERUSER_PASSWORD` (o `ADMIN_USERNAME` / `ADMIN_PASSWORD`).
+   - Durante el build, `init_render.py` actualizará la contraseña del superusuario existente.
+3. Intenta ingresar usando:
+   - Usuario: el `username` (por defecto `admin`).
+   - Email: `admin@sistema-medico.com` (o el email que definiste).
+   - El formulario acepta `email`, `RUT` o `username` en el campo usuario.
+
 ### Error de Archivos Estáticos
 
 1. Verifica que `STATICFILES_STORAGE` esté configurado correctamente

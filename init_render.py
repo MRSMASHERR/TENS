@@ -105,6 +105,31 @@ def main():
             print(f"   Contraseña: {password}")
         else:
             print("✅ Ya existe un superusuario")
+            # Si se proporcionan variables de entorno, permitir actualizar contraseña del superusuario existente
+            new_password = (
+                os.environ.get('ADMIN_PASSWORD')
+                or os.environ.get('DJANGO_SUPERUSER_PASSWORD')
+            )
+            target_username = (
+                os.environ.get('ADMIN_USERNAME')
+                or os.environ.get('DJANGO_SUPERUSER_USERNAME')
+            )
+
+            if new_password:
+                try:
+                    if target_username:
+                        target_user = User.objects.filter(username=target_username).first()
+                    else:
+                        target_user = User.objects.filter(is_superuser=True).first()
+
+                    if target_user:
+                        target_user.set_password(new_password)
+                        target_user.save()
+                        print(f"🔐 Contraseña actualizada para superusuario '{target_user.username}'")
+                    else:
+                        print("⚠️ No se encontró el superusuario objetivo para actualizar la contraseña")
+                except Exception as e:
+                    print(f"⚠️ Error al actualizar contraseña del superusuario: {e}")
     except Exception as e:
         print(f"⚠️ Error al crear superusuario: {e}")
     

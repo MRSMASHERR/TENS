@@ -192,6 +192,13 @@ CSRF_TRUSTED_ORIGINS = [
     'http://tens.onrender.com',   # También permitir HTTP para desarrollo
 ]
 
+# Incluir dinámicamente el hostname de Render en CSRF_TRUSTED_ORIGINS
+if RENDER_EXTERNAL_HOSTNAME:
+    CSRF_TRUSTED_ORIGINS += [
+        f"https://{RENDER_EXTERNAL_HOSTNAME}",
+        f"http://{RENDER_EXTERNAL_HOSTNAME}",
+    ]
+
 # Session Configuration
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
 SESSION_SAVE_EVERY_REQUEST = True
