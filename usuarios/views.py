@@ -96,17 +96,17 @@ class RegistroUsuarioView(UserPassesTestMixin, CreateView):
                 # Si es docente, añadir campos específicos
                 form.fields['especialidad'] = forms.CharField(
                     widget=forms.TextInput(attrs={'class': 'form-control'}),
-                    required=True,
+                    required=False,
                     label='Especialidad'
                 )
                 form.fields['titulo_profesional'] = forms.CharField(
                     widget=forms.TextInput(attrs={'class': 'form-control'}),
-                    required=True,
+                    required=False,
                     label='Título Profesional'
                 )
                 form.fields['anos_experiencia'] = forms.IntegerField(
                     widget=forms.NumberInput(attrs={'class': 'form-control'}),
-                    required=True,
+                    required=False,
                     min_value=0,
                     initial=0,
                     label='Años de Experiencia'
@@ -115,17 +115,17 @@ class RegistroUsuarioView(UserPassesTestMixin, CreateView):
                 # Si es estudiante, añadir campos específicos
                 form.fields['matricula'] = forms.CharField(
                     widget=forms.TextInput(attrs={'class': 'form-control'}),
-                    required=True,
+                    required=False,
                     label='Matrícula'
                 )
                 form.fields['ano_ingreso'] = forms.IntegerField(
                     widget=forms.NumberInput(attrs={'class': 'form-control'}),
-                    required=True,
+                    required=False,
                     label='Año de Ingreso'
                 )
                 form.fields['semestre_actual'] = forms.IntegerField(
                     widget=forms.NumberInput(attrs={'class': 'form-control'}),
-                    required=True,
+                    required=False,
                     label='Semestre Actual'
                 )
         return form
@@ -143,6 +143,8 @@ class RegistroUsuarioView(UserPassesTestMixin, CreateView):
             if rol == 'administrador':
                 usuario.is_superuser = True
                 usuario.is_staff = True
+                # Asegurar que administradores no sean pacientes
+                usuario.es_paciente = False
             elif rol == 'docente':
                 usuario.especialidad = form.cleaned_data.get('especialidad', '')
                 usuario.titulo_profesional = form.cleaned_data.get('titulo_profesional', '')

@@ -232,22 +232,8 @@ class RegistroUsuarioForm(UserCreationForm):
     def clean(self):
         cleaned_data = super().clean()
         print("Datos limpios del formulario:", cleaned_data)
-        
-        # Validar que los campos específicos del rol estén presentes
-        rol = cleaned_data.get('rol')
-        if rol == 'docente':
-            if not cleaned_data.get('especialidad'):
-                self.add_error('especialidad', 'La especialidad es requerida para docentes')
-            if not cleaned_data.get('titulo_profesional'):
-                self.add_error('titulo_profesional', 'El título profesional es requerido para docentes')
-        elif rol == 'estudiante':
-            if not cleaned_data.get('matricula'):
-                self.add_error('matricula', 'La matrícula es requerida para estudiantes')
-            if not cleaned_data.get('ano_ingreso'):
-                self.add_error('ano_ingreso', 'El año de ingreso es requerido para estudiantes')
-            if not cleaned_data.get('semestre_actual'):
-                self.add_error('semestre_actual', 'El semestre actual es requerido para estudiantes')
-        
+        # Los campos específicos de rol son opcionales en el registro.
+        # Se podrán completar posteriormente desde el perfil o edición.
         return cleaned_data
     
     def clean_rut(self):
@@ -693,4 +679,4 @@ def validar_rut(rut):
         return None
         
     # Retornar RUT formateado correctamente
-    return f"{rut_num}-{dv}" 
+    return f"{rut_num}-{dv}"

@@ -122,7 +122,7 @@
                         </div>
                         
                         <!-- Campo es_paciente -->
-                        <div class="row">
+                        <div class="row" id="row_es_paciente">
                             <div class="col-md-12 mb-3">
                                 <div class="form-check">
                                     {{ form.es_paciente }}
@@ -136,75 +136,8 @@
                             </div>
                         </div>
                         
-                        <!-- Campos específicos para docentes -->
-                        <div id="campos_docente" style="display: none;">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.especialidad.id_for_label }}" class="form-label">Especialidad</label>
-                                    {{ form.especialidad }}
-                                    {% if form.especialidad.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.especialidad.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.titulo_profesional.id_for_label }}" class="form-label">Título Profesional</label>
-                                    {{ form.titulo_profesional }}
-                                    {% if form.titulo_profesional.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.titulo_profesional.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.anos_experiencia.id_for_label }}" class="form-label">Años de Experiencia</label>
-                                    {{ form.anos_experiencia }}
-                                    {% if form.anos_experiencia.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.anos_experiencia.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Campos específicos para estudiantes -->
-                        <div id="campos_estudiante" style="display: none;">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.matricula.id_for_label }}" class="form-label">Matrícula</label>
-                                    {{ form.matricula }}
-                                    {% if form.matricula.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.matricula.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.ano_ingreso.id_for_label }}" class="form-label">Año de Ingreso</label>
-                                    {{ form.ano_ingreso }}
-                                    {% if form.ano_ingreso.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.ano_ingreso.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.semestre_actual.id_for_label }}" class="form-label">Semestre Actual</label>
-                                    {{ form.semestre_actual }}
-                                    {% if form.semestre_actual.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.semestre_actual.errors }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Campos específicos para roles ocultos en registro -->
+                        <!-- Se ocultan para simplificar el registro; se podrán editar luego en el perfil. -->
                         
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary">Registrar Usuario</button>
@@ -221,18 +154,17 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const rolSelect = document.getElementById('{{ form.rol.id_for_label }}');
-        const camposDocente = document.getElementById('campos_docente');
-        const camposEstudiante = document.getElementById('campos_estudiante');
-        
-        function mostrarCamposPorRol() {
+        const rowEsPaciente = document.getElementById('row_es_paciente');
+
+        function toggleEsPaciente() {
             const rolSeleccionado = rolSelect.value;
-            camposDocente.style.display = rolSeleccionado === 'docente' ? 'block' : 'none';
-            camposEstudiante.style.display = rolSeleccionado === 'estudiante' ? 'block' : 'none';
+            // Ocultar el checkbox "Es paciente" cuando el rol es administrador
+            rowEsPaciente.style.display = rolSeleccionado === 'administrador' ? 'none' : 'block';
         }
-        
-        rolSelect.addEventListener('change', mostrarCamposPorRol);
-        mostrarCamposPorRol();
+
+        rolSelect.addEventListener('change', toggleEsPaciente);
+        toggleEsPaciente();
     });
 </script>
 {% endblock %}
-{% endblock %} 
+{% endblock %}

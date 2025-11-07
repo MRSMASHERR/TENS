@@ -71,6 +71,8 @@ class Usuario(AbstractUser):
         if self.rol == 'administrador':
             self.is_superuser = True
             self.is_staff = True
+            # Los administradores no son pacientes
+            self.es_paciente = False
         
         super().save(*args, **kwargs)
 
