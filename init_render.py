@@ -75,9 +75,22 @@ def main():
         
         # Verificar si ya existe un superusuario
         if not User.objects.filter(is_superuser=True).exists():
-            username = os.environ.get('ADMIN_USERNAME', 'admin')
-            email = os.environ.get('ADMIN_EMAIL', 'admin@sistema-medico.com')
-            password = os.environ.get('ADMIN_PASSWORD', 'admin123456')
+            # Permitir ambos esquemas de variables de entorno
+            username = (
+                os.environ.get('ADMIN_USERNAME')
+                or os.environ.get('DJANGO_SUPERUSER_USERNAME')
+                or 'admin'
+            )
+            email = (
+                os.environ.get('ADMIN_EMAIL')
+                or os.environ.get('DJANGO_SUPERUSER_EMAIL')
+                or 'admin@sistema-medico.com'
+            )
+            password = (
+                os.environ.get('ADMIN_PASSWORD')
+                or os.environ.get('DJANGO_SUPERUSER_PASSWORD')
+                or 'admin123456'
+            )
             
             user = User.objects.create_superuser(
                 username=username,
@@ -100,4 +113,4 @@ def main():
 
 if __name__ == '__main__':
     success = main()
-    sys.exit(0 if success else 1) 
+    sys.exit(0 if success else 1)

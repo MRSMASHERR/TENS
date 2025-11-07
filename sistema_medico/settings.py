@@ -1,4 +1,5 @@
 import os
+import dj_database_url
 from dotenv import load_dotenv
 load_dotenv()
 from pathlib import Path
@@ -87,18 +88,8 @@ WSGI_APPLICATION = 'sistema_medico.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# Configuración de Firebase
-FIREBASE_CONFIG = {
-    'apiKey': os.environ.get('FIREBASE_API_KEY'),
-    'authDomain': os.environ.get('FIREBASE_AUTH_DOMAIN'),
-    'projectId': os.environ.get('FIREBASE_PROJECT_ID'),
-    'storageBucket': os.environ.get('FIREBASE_STORAGE_BUCKET'),
-    'messagingSenderId': os.environ.get('FIREBASE_MESSAGING_SENDER_ID'),
-    'appId': os.environ.get('FIREBASE_APP_ID'),
-    'databaseURL': os.environ.get('FIREBASE_DATABASE_URL'),
-}
-
-# Configuración de base de datos - SQLite para desarrollo y producción
+# Configuración de base de datos
+# Por defecto usa SQLite; si existe DATABASE_URL usa PostgreSQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -106,8 +97,13 @@ DATABASES = {
     }
 }
 
-# Configuración para usar Firebase como base de datos principal
-USE_FIREBASE = os.environ.get('USE_FIREBASE', 'False') == 'True'
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    # Parsear cadena de conexión de Render (incluye sslmode=require)
+    DATABASES['default'] = dj_database_url.parse(
+        DATABASE_URL,
+        conn_max_age=600,
+    )
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

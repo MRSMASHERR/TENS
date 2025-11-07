@@ -1,12 +1,9 @@
 # Framework y componentes principales
 Django==5.1.7
 reportlab==4.1.0
-pillow==10.2.0
+pillow==11.0.0
 gunicorn
 
-# Firebase
-firebase-admin==6.4.0
-pyrebase4==4.7.1
 
 # Interfaz de usuario y Frontend
 whitenoise==6.6.0       # Para servir archivos estáticos
@@ -43,4 +40,6 @@ djangorestframework==3.14.0
 # Environment variables
 python-dotenv
 
-# Base de datos (SQLite incluido con Django) 
+# Base de datos (SQLite incluido con Django)
+dj-database-url==2.1.0
+psycopg[binary]

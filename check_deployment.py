@@ -26,7 +26,6 @@ def check_environment():
     critical_vars = [
         'DJANGO_SECRET_KEY',
         'DEBUG',
-        'USE_FIREBASE',
     ]
     
     for var in critical_vars:
@@ -44,7 +43,7 @@ def check_database():
     
     print(f"Base de datos: {settings.DATABASES['default']['ENGINE']}")
     print(f"Nombre: {settings.DATABASES['default']['NAME']}")
-    print(f"Usar Firebase: {getattr(settings, 'USE_FIREBASE', False)}")
+    # Firebase eliminado: no se utiliza
     
     try:
         # Intentar hacer una consulta simple
@@ -167,4 +166,4 @@ def main():
     print("✅ Verificación completada")
 
 if __name__ == '__main__':
-    main() 
+    main()

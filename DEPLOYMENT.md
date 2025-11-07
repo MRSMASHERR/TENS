@@ -107,7 +107,7 @@ Si no configuras las variables de superusuario, se creará automáticamente con:
 ### Error de Base de Datos
 
 1. Verifica que las migraciones se ejecuten correctamente
-2. Asegúrate de que `USE_FIREBASE=False` si no estás usando Firebase
+2. El proyecto usa SQLite por defecto; no requiere configuración de Firebase
 
 ## Monitoreo
 
@@ -124,8 +124,8 @@ Si no configuras las variables de superusuario, se creará automáticamente con:
 # Verificar configuración
 python check_deployment.py
 
-# Crear superusuario manualmente
-python create_superuser_render.py
+# Crear superusuario durante el build
+python init_render.py
 
 # Ejecutar migraciones
 python manage.py migrate
@@ -139,4 +139,4 @@ python manage.py collectstatic --noinput
 Si encuentras problemas adicionales, revisa:
 1. Los logs de Render en tiempo real
 2. La configuración de variables de entorno
-3. La configuración de seguridad en `settings.py` 
+3. La configuración de seguridad en `settings.py`
